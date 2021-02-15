@@ -6,17 +6,26 @@ import java.util.PriorityQueue;
 class Simulation {
     public static void main(String[] args)
     {
+        GUI gui1 = new GUI();
+        String[] test = {"Test"};
+
+        
+        
         double throughput = 0;
         int numProcessesComplete = 0;
         int timeElapsed = 0;
 
         ProcessQueueManager pqc = new ProcessQueueManager();
         PriorityQueue<Process> processQueue = pqc.getProcessQueue();
+        gui1.set_pqc(processQueue);
+        gui1.main(test);
 
+        /*
         while (!processQueue.isEmpty())
         {
             Process currProcess = processQueue.poll(); // Retrieves the top-priority process and removes it from processQueue
 
+            
             Thread processThread = new Thread(currProcess);
             processThread.start();
             System.out.println(currProcess.getID() + " is running");
@@ -30,5 +39,7 @@ class Simulation {
             System.out.println(currProcess.getID() + " ran for " + currProcess.getSerTime() + " seconds\n");
 
         }
+        */
+        
     }
 }

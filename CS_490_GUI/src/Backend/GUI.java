@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package GUI;
+package Backend;
+
+import java.util.PriorityQueue;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -13,16 +17,24 @@ public class GUI extends javax.swing.JFrame {
     int CPU;
     String execStatus;
     double timeRemaining;
+    Simulation sim1;
+    Vector<Process> allProcesses = new Vector<Process>(5);
+    PriorityQueue<Process> pqc_temp;
     
     /**
      * Creates new form GUI
      */
+    
     public GUI() {
         initComponents();
-        StatusPane1.setText("CPU:" + CPU + "\nexec: " + execStatus + "\nttime remaining: " + timeRemaining);
+        StatusPane1.setText("CPU:" + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
+        
         
     }
 
+    
+   
+    
     void updateVariables(int CPUs, String status, double time)
     {
         CPU = CPUs;
@@ -205,8 +217,38 @@ public class GUI extends javax.swing.JFrame {
         
     }//GEN-LAST:event_Table1AncestorAdded
 
+    void set_pqc(PriorityQueue<Process> input)
+    {
+        pqc_temp = new PriorityQueue<>(input);
+        //System.out.println("TEST");
+    }
+    
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
+       //String temp = allProcesses.get(0).getID();
+       System.out.println(pqc_temp.peek().getID());
+       allProcesses.addElement(pqc_temp.poll());
+       allProcesses.addElement(pqc_temp.poll());
+       allProcesses.addElement(pqc_temp.poll());
+       DefaultTableModel model = (DefaultTableModel) Table1.getModel();
+
+       
+       /*
+       for (int i = 0; i < allProcesses.size(); i++)
+       {
+           if (i < 5)
+           {
+               model.setValueAt(allProcesses.get(i).getID(), 0, 0);
+               model.setValueAt(allProcesses.get(i).getSerTime(), 0, 1);
+           }
+           else
+           {
+               Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
+               model.addRow(rowInput);
+           }
+           
+       }
+       */
        
     }//GEN-LAST:event_StartButtonActionPerformed
 

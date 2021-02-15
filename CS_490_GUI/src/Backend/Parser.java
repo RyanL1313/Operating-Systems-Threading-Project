@@ -24,10 +24,10 @@ public class Parser {
 
     private Scanner getInputFileReader()
     {
-        Scanner userInput = new Scanner(System.in);
-        System.out.println("What is the name of your input text file?");
+        //Scanner userInput = new Scanner(System.in);
+        //System.out.println("What is the name of your input text file?");
 
-        processFileName = userInput.nextLine();
+        processFileName = "processes.txt";
 
         inFile = new File(System.getProperty("user.dir") + "\\" + processFileName);
 
