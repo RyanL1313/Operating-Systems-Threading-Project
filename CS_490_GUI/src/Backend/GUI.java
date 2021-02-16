@@ -14,33 +14,19 @@ import javax.swing.table.DefaultTableModel;
  * @author evilc
  */
 public class GUI extends javax.swing.JFrame {
+    Vector<Process> allProcesses = new Vector<Process>(5);
+    PriorityQueue<Process> pqc_temp;
     int CPU;
     String execStatus;
     double timeRemaining;
-    Simulation sim1;
-    Vector<Process> allProcesses = new Vector<Process>(5);
-    PriorityQueue<Process> pqc_temp;
-    
     /**
      * Creates new form GUI
      */
-    
     public GUI() {
         initComponents();
         StatusPane1.setText("CPU:" + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
-        
-        
     }
 
-    
-   
-    
-    void updateVariables(int CPUs, String status, double time)
-    {
-        CPU = CPUs;
-        execStatus = status;
-        timeRemaining = time;
-    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,29 +36,21 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        PauseButton = new javax.swing.JButton();
         StartButton = new javax.swing.JButton();
+        PauseButton = new javax.swing.JButton();
         SystemStatus = new javax.swing.JLabel();
+        UnitDisplay = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         Table1 = new javax.swing.JTable();
-        jLabel3 = new javax.swing.JLabel();
-        UnitDisplay = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         StatusPane1 = new javax.swing.JTextPane();
+        jLabel4 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         StatusPane2 = new javax.swing.JTextPane();
-        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        PauseButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        PauseButton.setText("Pause System");
-        PauseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PauseButtonActionPerformed(evt);
-            }
-        });
 
         StartButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         StartButton.setText("Start System");
@@ -82,8 +60,20 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        PauseButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        PauseButton.setText("Pause System");
+        PauseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PauseButtonActionPerformed(evt);
+            }
+        });
+
         SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         SystemStatus.setText("System Status");
+
+        UnitDisplay.setEditable(false);
+
+        jLabel3.setText("1 time unit =");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Waiting Process Queue");
@@ -129,22 +119,14 @@ public class GUI extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(Table1);
-        if (Table1.getColumnModel().getColumnCount() > 0) {
-            Table1.getColumnModel().getColumn(0).setResizable(false);
-            Table1.getColumnModel().getColumn(1).setResizable(false);
-        }
-
-        jLabel3.setText("1 time unit =");
-
-        UnitDisplay.setEditable(false);
 
         StatusPane1.setEditable(false);
         jScrollPane2.setViewportView(StatusPane1);
 
+        jLabel4.setText("ms");
+
         StatusPane2.setEditable(false);
         jScrollPane3.setViewportView(StatusPane2);
-
-        jLabel4.setText("ms");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -200,22 +182,13 @@ public class GUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_PauseButtonActionPerformed
-
-    private void Table1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_Table1AncestorAdded
-        // TODO add your handling code here:
-        
-    }//GEN-LAST:event_Table1AncestorAdded
 
     void set_pqc(PriorityQueue<Process> input)
     {
@@ -225,70 +198,59 @@ public class GUI extends javax.swing.JFrame {
     
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
-       //String temp = allProcesses.get(0).getID();
-       System.out.println(pqc_temp.peek().getID());
-       allProcesses.addElement(pqc_temp.poll());
-       allProcesses.addElement(pqc_temp.poll());
-       allProcesses.addElement(pqc_temp.poll());
-       DefaultTableModel model = (DefaultTableModel) Table1.getModel();
+        //String temp = allProcesses.get(0).getID();
 
-       
-       /*
-       for (int i = 0; i < allProcesses.size(); i++)
-       {
-           if (i < 5)
-           {
-               model.setValueAt(allProcesses.get(i).getID(), 0, 0);
-               model.setValueAt(allProcesses.get(i).getSerTime(), 0, 1);
-           }
-           else
-           {
-               Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
-               model.addRow(rowInput);
-           }
-           
-       }
-       */
-       
+        /*
+        String processA_attributes[] = {"5", "A", "1", "1"};
+        Process processA = new Process(processA_attributes);
+
+        String processB_attributes[] = {"10", "B", "1", "1"};
+        Process processB = new Process(processB_attributes);
+
+        String processC_attributes[] = {"15", "C", "1", "1"};
+        Process processC = new Process(processC_attributes);
+
+        pqc_temp.add(processA);
+        pqc_temp.add(processB);
+        pqc_temp.add(processC);
+        */
+
+        System.out.println(pqc_temp.peek().getID());
+        allProcesses.addElement(pqc_temp.poll());
+        allProcesses.addElement(pqc_temp.poll());
+        allProcesses.addElement(pqc_temp.poll());
+        DefaultTableModel model = (DefaultTableModel) Table1.getModel();
+
+        
+        for (int i = 0; i < allProcesses.size(); i++)
+        {
+            if (i < 5)
+            {
+                model.setValueAt(allProcesses.get(i).getID(), i, 0);
+                model.setValueAt(allProcesses.get(i).getSerTime(), i, 1);
+            }
+            else
+            {
+                Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
+                model.addRow(rowInput);
+            }
+
+        }
+        
     }//GEN-LAST:event_StartButtonActionPerformed
 
-    
-    
+    private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PauseButtonActionPerformed
+
+    private void Table1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_Table1AncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Table1AncestorAdded
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new GUI().setVisible(true);
-                
-            }
-        });
-    }
+  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton PauseButton;

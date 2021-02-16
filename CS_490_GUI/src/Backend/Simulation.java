@@ -6,8 +6,8 @@ import java.util.PriorityQueue;
 class Simulation {
     public static void main(String[] args)
     {
-        GUI gui1 = new GUI();
-        String[] test = {"Test"};
+        
+        //String[] test = {"Test"};
 
         
         
@@ -17,8 +17,11 @@ class Simulation {
 
         ProcessQueueManager pqc = new ProcessQueueManager();
         PriorityQueue<Process> processQueue = pqc.getProcessQueue();
-        gui1.set_pqc(processQueue);
-        gui1.main(test);
+        GUI gui = new GUI();
+        gui.set_pqc(processQueue);
+        gui.setVisible(true);
+
+
 
         /*
         while (!processQueue.isEmpty())
