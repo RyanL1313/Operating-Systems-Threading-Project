@@ -19,6 +19,8 @@ public class GUI extends javax.swing.JFrame {
     int CPU;
     String execStatus;
     double timeRemaining;
+    boolean alreadyStarted = false;
+    boolean paused = false;
     /**
      * Creates new form GUI
      */
@@ -39,7 +41,7 @@ public class GUI extends javax.swing.JFrame {
         StartButton = new javax.swing.JButton();
         PauseButton = new javax.swing.JButton();
         SystemStatus = new javax.swing.JLabel();
-        UnitDisplay = new javax.swing.JTextField();
+        pollRateInput = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -71,7 +73,11 @@ public class GUI extends javax.swing.JFrame {
         SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         SystemStatus.setText("System Status");
 
-        UnitDisplay.setEditable(false);
+        pollRateInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pollRateInputActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("1 time unit =");
 
@@ -140,7 +146,7 @@ public class GUI extends javax.swing.JFrame {
                         .addGap(74, 74, 74)
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(UnitDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(10, 10, 10)
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -156,7 +162,7 @@ public class GUI extends javax.swing.JFrame {
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(28, 28, 28)
+                                .addGap(18, 18, 18)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
@@ -172,16 +178,13 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3)
-                        .addComponent(UnitDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel4))
                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -199,53 +202,56 @@ public class GUI extends javax.swing.JFrame {
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
         //String temp = allProcesses.get(0).getID();
-
-        /*
-        String processA_attributes[] = {"5", "A", "1", "1"};
-        Process processA = new Process(processA_attributes);
-
-        String processB_attributes[] = {"10", "B", "1", "1"};
-        Process processB = new Process(processB_attributes);
-
-        String processC_attributes[] = {"15", "C", "1", "1"};
-        Process processC = new Process(processC_attributes);
-
-        pqc_temp.add(processA);
-        pqc_temp.add(processB);
-        pqc_temp.add(processC);
-        */
-
-        System.out.println(pqc_temp.peek().getID());
-        allProcesses.addElement(pqc_temp.poll());
-        allProcesses.addElement(pqc_temp.poll());
-        allProcesses.addElement(pqc_temp.poll());
-        DefaultTableModel model = (DefaultTableModel) Table1.getModel();
+        StartButton.setEnabled(false);
+        PauseButton.setEnabled(true);
 
         
-        for (int i = 0; i < allProcesses.size(); i++)
+        if (alreadyStarted == false)
         {
-            if (i < 5)
-            {
-                model.setValueAt(allProcesses.get(i).getID(), i, 0);
-                model.setValueAt(allProcesses.get(i).getSerTime(), i, 1);
-            }
-            else
-            {
-                Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
-                model.addRow(rowInput);
-            }
+            allProcesses.addElement(pqc_temp.poll());
+            allProcesses.addElement(pqc_temp.poll());
+            allProcesses.addElement(pqc_temp.poll());
+            DefaultTableModel model = (DefaultTableModel) Table1.getModel();
 
+
+            for (int i = 0; i < allProcesses.size(); i++)
+            {
+                if (i < 5)
+                {
+                    model.setValueAt(allProcesses.get(i).getID(), i, 0);
+                    model.setValueAt(allProcesses.get(i).getSerTime(), i, 1);
+                }
+                else
+                {
+                    Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
+                    model.addRow(rowInput);
+                }
+
+            }
+            alreadyStarted = true;
         }
+        else
+        {
+            paused = false;
+        }
+       
         
     }//GEN-LAST:event_StartButtonActionPerformed
 
     private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
         // TODO add your handling code here:
+        paused = true;
+        PauseButton.setEnabled(false);
+        StartButton.setEnabled(true);
     }//GEN-LAST:event_PauseButtonActionPerformed
 
     private void Table1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_Table1AncestorAdded
         // TODO add your handling code here:
     }//GEN-LAST:event_Table1AncestorAdded
+
+    private void pollRateInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pollRateInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pollRateInputActionPerformed
 
     /**
      * @param args the command line arguments
@@ -259,12 +265,12 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextPane StatusPane2;
     private javax.swing.JLabel SystemStatus;
     private javax.swing.JTable Table1;
-    private javax.swing.JTextField UnitDisplay;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextField pollRateInput;
     // End of variables declaration//GEN-END:variables
 }
