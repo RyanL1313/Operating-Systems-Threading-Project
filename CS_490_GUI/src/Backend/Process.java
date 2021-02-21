@@ -12,6 +12,7 @@ public class Process implements Runnable{
     private int serTime;
     private int priority;
     private static final int NUMATTRIBUTES = 4;
+    private int pollRate; // in ms
 
     /**
      * Default Constructor
@@ -21,6 +22,7 @@ public class Process implements Runnable{
         ID = "Null";
         serTime = -1;
         priority = -1;
+        pollRate = 1000;
     }
 
     /**
@@ -48,6 +50,16 @@ public class Process implements Runnable{
     public void setSerTime(int input)
     {
         serTime = input;
+    }
+
+    public void setPollRate(int input)
+    {
+        pollRate = input;
+    }
+
+    public int getPollRate()
+    {
+        return pollRate;
     }
 
     public int getArrTime()
@@ -82,7 +94,7 @@ public class Process implements Runnable{
     @Override
     public void run() {
         try {
-            Thread.sleep((long)(serTime*1000)); // Sleeps for the service time * 1000 milliseconds
+            Thread.sleep((long)(serTime*pollRate)); // Sleeps for the service time * pollRate in ms
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
