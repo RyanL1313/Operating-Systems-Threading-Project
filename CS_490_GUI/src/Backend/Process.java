@@ -4,9 +4,9 @@ package Backend;
  *<h1>process Class</h1>
  * Stores process data <br>
  * arrival time, process id, service time, priority
- *@author Braden McGee
+ *@author Braden McGee, Ryan Lynch
  */
-public class Process implements Runnable{
+public class Process implements Runnable {
     private int arrTime;
     private String ID;
     private int serTime;

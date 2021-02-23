@@ -1,5 +1,6 @@
 package Backend;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.Scanner;
 
@@ -7,12 +8,12 @@ import java.util.Scanner;
  *<h1>parse Class</h1>
  * Parses a comma delimited file into a collection of Process objects <br>
  *
- *@author Braden McGee
+ *@author Braden McGee, Ryan Lynch
  */
 public class Parser {
-    private String processFileName;
-    private File inFile;
-    private Scanner inFileScanner;
+    private String processPathName; // The full path of the file of processes
+    private File inFile; // The File object to read the CSV file
+    private Scanner inFileScanner; // A scanner to read the file
 
     /**
      * Constructor
@@ -22,27 +23,23 @@ public class Parser {
         getInputFileReader();
     }
 
-    private Scanner getInputFileReader()
+    private void getInputFileReader()
     {
-        //Scanner userInput = new Scanner(System.in);
-        //System.out.println("What is the name of your input text file?");
+        // Display a dialog box to retrieve the full file path, then initialize the File object
+        processPathName = JOptionPane.showInputDialog("Enter the full path of your processes file");
+        inFile = new File(processPathName);
 
-        processFileName = "processes.txt";
-
-        inFile = new File(System.getProperty("user.dir") + "\\" + processFileName);
-
+        // Initialize the file Scanner
         try {
             inFileScanner = new Scanner(inFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        return null; // This shouldn't be reached
     }
 
     /**
-     *
-     * @return
+     * Gets the next process in the CSV file.
+     * @return A process object with all of the attributes that were read in from the file.
      */
     public Process nextProcess()
     {
