@@ -7,6 +7,7 @@ package Backend;
 
 import java.util.PriorityQueue;
 import java.util.Vector;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,12 +22,14 @@ public class GUI extends javax.swing.JFrame {
     double timeRemaining;
     boolean alreadyStarted = false;
     boolean paused = false;
+    int pollRateVal = 0;
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
-        StatusPane1.setText("CPU:" + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
+        StatusPane1.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
+        StatusPane2.setText("System Log:\n");
     }
 
     /**
@@ -41,7 +44,7 @@ public class GUI extends javax.swing.JFrame {
         StartButton = new javax.swing.JButton();
         PauseButton = new javax.swing.JButton();
         SystemStatus = new javax.swing.JLabel();
-        pollRateInput = new javax.swing.JTextField();
+        pollRateInput = new javax.swing.JTextField("1000");
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -78,7 +81,6 @@ public class GUI extends javax.swing.JFrame {
                 pollRateInputActionPerformed(evt);
             }
         });
-
         jLabel3.setText("1 time unit =");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -208,6 +210,7 @@ public class GUI extends javax.swing.JFrame {
         
         if (alreadyStarted == false)
         {
+            pollRateVal = Integer.parseInt(pollRateInput.getText());
             allProcesses.addElement(pqc_temp.poll());
             allProcesses.addElement(pqc_temp.poll());
             allProcesses.addElement(pqc_temp.poll());
@@ -253,6 +256,13 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_pollRateInputActionPerformed
 
+    public int getPollRateVal() {
+        return pollRateVal;
+    }
+
+    public boolean getPauseState(){
+        return paused;
+    }
     /**
      * @param args the command line arguments
      */

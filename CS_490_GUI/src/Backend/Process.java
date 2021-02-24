@@ -11,8 +11,9 @@ public class Process implements Runnable {
     private String ID;
     private int serTime;
     private int priority;
-    private static final int NUMATTRIBUTES = 4;
     private int pollRate; // in ms
+    private int CPU;
+    private static final int NUMATTRIBUTES = 4;
 
     /**
      * Default Constructor
@@ -35,6 +36,7 @@ public class Process implements Runnable {
         ID = processAttributes[1];
         serTime = Integer.parseInt(processAttributes[2]);
         priority = Integer.parseInt(processAttributes[3]);
+        pollRate = 1000;
     }
     
     public void setID(String input)
@@ -56,6 +58,8 @@ public class Process implements Runnable {
     {
         pollRate = input;
     }
+
+    public void setCPU(int CPU) { this.CPU = CPU; }
 
     public int getPollRate()
     {
@@ -82,6 +86,8 @@ public class Process implements Runnable {
         return priority;
     }
 
+    public int getCPU() { return CPU; }
+
     /**
      * Gets the number of attributes contained within each process.
      * @return The number of attributes
@@ -93,8 +99,23 @@ public class Process implements Runnable {
 
     @Override
     public void run() {
+        int temp = serTime;
+        boolean paused = false;
         try {
-            Thread.sleep((long)(serTime*pollRate)); // Sleeps for the service time * pollRate in ms
+            while(temp!= 0){
+                Thread.sleep((long)(pollRate)); // Sleeps for the poll rate in ms, then updates temp
+                temp--;
+                do{
+                    /* Insert Code to Update paused
+                     *
+                     *
+                     *
+                     */
+                    if(paused==true) Thread.sleep(500);
+                } while(paused==true);
+                // Runtime Window Update:
+                // System.out.println("CPU: " + CPU + "\nexec: " + (serTime-temp) + "\ntime remaining: " + temp);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
