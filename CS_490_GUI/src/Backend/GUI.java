@@ -305,7 +305,7 @@ public class GUI extends javax.swing.JFrame {
         StyledDocument document = (StyledDocument) StatusPane2.getDocument();
 
         try {
-            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " seconds.\n", null);
+            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " time units.\n", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -317,7 +317,7 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
-    public void updateCPUStats(String processID, int CPU, double timeRemaining)
+    public void updateCPUStats(String processID, int CPU, int timeRemaining)
     {
         StyledDocument document = (StyledDocument) StatusPane1.getDocument();
         // Cleaning Document
@@ -328,7 +328,7 @@ public class GUI extends javax.swing.JFrame {
         }
         // Updating new information
         try {
-            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + String.format("%4.0f", timeRemaining) + " ms", null);
+            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
