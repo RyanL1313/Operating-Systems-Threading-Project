@@ -37,6 +37,7 @@ class Simulation {
         {
             Process currProcess = processQueue.poll(); // Retrieves the top-priority process and removes it from processQueue
             currProcess.setPollRate(pollRateVal);
+            currProcess.setGUI(gui);
             Thread processThread = new Thread(currProcess);
             processThread.start();
             System.out.println(currProcess.getID() + " is running");

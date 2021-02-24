@@ -14,6 +14,7 @@ public class Process implements Runnable {
     private int pollRate; // in ms
     private int CPU;
     private static final int NUMATTRIBUTES = 4;
+    private GUI gui;
 
     /**
      * Default Constructor
@@ -61,6 +62,8 @@ public class Process implements Runnable {
 
     public void setCPU(int CPU) { this.CPU = CPU; }
 
+    public void setGUI (GUI gui) { this.gui = gui; }
+
     public int getPollRate()
     {
         return pollRate;
@@ -99,22 +102,17 @@ public class Process implements Runnable {
 
     @Override
     public void run() {
-        int temp = serTime;
+        long temp = (long)serTime*1000;
         boolean paused = false;
         try {
-            while(temp!= 0){
+            while(temp > 0){
                 Thread.sleep((long)(pollRate)); // Sleeps for the poll rate in ms, then updates temp
-                temp--;
+                temp = temp - pollRate;
                 do{
-                    /* Insert Code to Update paused
-                     *
-                     *
-                     *
-                     */
+                    paused = gui.getPauseState();
                     if(paused==true) Thread.sleep(50);
                 } while(paused==true);
-                // Runtime Window Update:
-                // System.out.println("CPU: " + CPU + "\nexec: " + (serTime-temp) + "\ntime remaining: " + temp);
+                gui.updateCPUStats(ID, CPU, temp);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

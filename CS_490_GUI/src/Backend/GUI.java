@@ -316,6 +316,23 @@ public class GUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+
+    public void updateCPUStats(String processID, int CPU, double timeRemaining)
+    {
+        StyledDocument document = (StyledDocument) StatusPane1.getDocument();
+        // Cleaning Document
+        try {
+            document.remove(0, document.getLength());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        // Updating new information
+        try {
+            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + String.format("%4.0f", timeRemaining) + " ms", null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
