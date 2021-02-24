@@ -305,7 +305,7 @@ public class GUI extends javax.swing.JFrame {
         StyledDocument document = (StyledDocument) StatusPane2.getDocument();
 
         try {
-            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " time units.\n", null);
+            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " seconds.\n", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }

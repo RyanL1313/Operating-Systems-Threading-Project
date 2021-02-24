@@ -102,17 +102,17 @@ public class Process implements Runnable {
 
     @Override
     public void run() {
-        long temp = (long)serTime*1000;
+        long timeRemaining = (long)serTime*1000;
         boolean paused = false;
         try {
-            while(temp > 0){
-                Thread.sleep((long)(pollRate)); // Sleeps for the poll rate in ms, then updates temp
-                temp = temp - pollRate;
+            while(timeRemaining > 0){
+                Thread.sleep((long)(pollRate)); // Sleeps for the poll rate in ms, then updates timeRemaining
+                timeRemaining = timeRemaining - pollRate;
                 do{
                     paused = gui.getPauseState();
                     if(paused==true) Thread.sleep(50);
                 } while(paused==true);
-                gui.updateCPUStats(ID, CPU, temp);
+                gui.updateCPUStats(ID, CPU, timeRemaining);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
