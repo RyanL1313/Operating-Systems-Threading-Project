@@ -5,10 +5,13 @@
  */
 package Backend;
 
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 /**
  *
@@ -29,7 +32,7 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
         initComponents();
         StatusPane1.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
-        StatusPane2.setText("System Log:\n");
+        StatusPane2.setText("System Log:\n\n");
     }
 
     /**
@@ -211,22 +214,27 @@ public class GUI extends javax.swing.JFrame {
         if (alreadyStarted == false)
         {
             pollRateVal = Integer.parseInt(pollRateInput.getText());
-            allProcesses.addElement(pqc_temp.poll());
-            allProcesses.addElement(pqc_temp.poll());
-            allProcesses.addElement(pqc_temp.poll());
+            //allProcesses.addElement(pqc_temp.poll());
+            //allProcesses.addElement(pqc_temp.poll());
+            //allProcesses.addElement(pqc_temp.poll());
             DefaultTableModel model = (DefaultTableModel) Table1.getModel();
 
+            int pqc_temp_size = pqc_temp.size();
 
-            for (int i = 0; i < allProcesses.size(); i++)
+            for (int i = 0; i < pqc_temp_size; i++)
             {
-                if (i < 5)
+                Process nextProcess = pqc_temp.poll();
+                String processID = nextProcess.getID();
+                String serviceTime = "" + nextProcess.getSerTime();
+
+                if (i < 7) // Initially, the table has 7 rows
                 {
-                    model.setValueAt(allProcesses.get(i).getID(), i, 0);
-                    model.setValueAt(allProcesses.get(i).getSerTime(), i, 1);
+                    model.setValueAt(processID, i, 0);
+                    model.setValueAt(serviceTime, i, 1);
                 }
                 else
                 {
-                    Object[] rowInput = {allProcesses.get(i).getID(), allProcesses.get(i).getSerTime()};
+                    Object[] rowInput = {processID, serviceTime};
                     model.addRow(rowInput);
                 }
 
@@ -263,9 +271,51 @@ public class GUI extends javax.swing.JFrame {
     public boolean getPauseState(){
         return paused;
     }
-    /**
-     * @param args the command line arguments
-     */
+
+    public void removeProcessFromTable()
+    {
+        int numRows = Table1.getRowCount();
+
+        for (int i = 1; i < numRows; i++)
+        {
+            if (Table1.getValueAt(0, 0).toString().equals(""))
+            {
+                break; // no more values in the table
+            }
+            else if (Table1.getValueAt(i, 0).toString().equals(""))
+            {
+                Table1.setValueAt("", i - 1, 0);
+                Table1.setValueAt("", i - 1, 1);
+                break; // This row has no values; nothing to shift up
+            }
+            else
+            {
+                // Shift the process's data up one row
+                Table1.setValueAt(Table1.getValueAt(i, 0), i - 1, 0);
+                Table1.setValueAt(Table1.getValueAt(i, 1), i - 1, 1);
+                Table1.setValueAt("", i, 0);
+                Table1.setValueAt("", i, 1);
+            }
+
+        }
+    }
+
+    public void updateSystemStats(String processID, int serviceTime, double throughput)
+    {
+        StyledDocument document = (StyledDocument) StatusPane2.getDocument();
+
+        try {
+            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " time units.\n", null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            document.insertString(document.getLength(), "Current throughput is " + String.format("%.2f", throughput) + " processes completed per time unit.\n\n", null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

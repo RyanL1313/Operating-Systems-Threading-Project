@@ -4,12 +4,14 @@ package Backend;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ * The Simulation class creates the Thread to manage the processes and update the GUI after a process completes execution.
+ */
 class Simulation {
+    //static PriorityQueue<Process> processQueue = new ProcessQueueManager().getProcessQueue();
+
     public static void main(String[] args)
     {
-        //String[] test = {"Test"};
-        
         double throughput = 0;
         int numProcessesComplete = 0;
         int timeElapsed = 0;
@@ -22,7 +24,7 @@ class Simulation {
         gui.setVisible(true);
 
         // Wait for poll rate/button press before running threads
-        while(pollRateVal == 0){
+        while(pollRateVal == 0) {
             try {
                 pollRateVal = gui.getPollRateVal();
                 TimeUnit.SECONDS.sleep(1);
@@ -47,13 +49,23 @@ class Simulation {
 
             while(gui.getPauseState() == true){
                 try {
+                    processThread.interrupt();
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            // This needs to go to System Window
+
+            // Debugging purposes
             System.out.println(currProcess.getID() + " ran for " + currProcess.getSerTime() + " seconds\n");
+
+            numProcessesComplete++;
+            timeElapsed += currProcess.getSerTime();
+            throughput = (double)numProcessesComplete / timeElapsed;
+
+            // Update the GUI after a process completes
+            gui.updateSystemStats(currProcess.getID(), currProcess.getSerTime(), throughput);
+            gui.removeProcessFromTable();
 
         }
 

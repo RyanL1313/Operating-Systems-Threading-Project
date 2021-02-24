@@ -111,7 +111,7 @@ public class Process implements Runnable {
                      *
                      *
                      */
-                    if(paused==true) Thread.sleep(500);
+                    if(paused==true) Thread.sleep(50);
                 } while(paused==true);
                 // Runtime Window Update:
                 // System.out.println("CPU: " + CPU + "\nexec: " + (serTime-temp) + "\ntime remaining: " + temp);
