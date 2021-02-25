@@ -3,7 +3,11 @@ package Backend;
 /**
  *<h1>process Class</h1>
  * Stores process data <br>
- * arrival time, process id, service time, priority
+ * arrival time, process id, service time, priority.
+ *
+ * Implements the Runnable interface to simulate the running of processes by putting processes to sleep for the service time * the poll rate (time unit).
+ * Updates the GUI every 1 time unit to display the decrementing amount of time remaining for the process.
+ *
  *@author Braden McGee, Ryan Lynch
  */
 public class Process implements Runnable {
@@ -11,8 +15,8 @@ public class Process implements Runnable {
     private String ID;
     private int serTime;
     private int priority;
-    private int pollRate; // in ms
     private int CPU;
+    private int pollRate;
     private static final int NUMATTRIBUTES = 4;
     private GUI gui;
 
@@ -106,6 +110,7 @@ public class Process implements Runnable {
         boolean paused = false;
         try {
             while(timeRemaining > 0){
+                pollRate = gui.getPollRateVal(); // Get the poll rate value again in case it has changed
                 Thread.sleep((long)(pollRate)); // Sleeps for the poll rate in ms, then updates timeRemaining
                 timeRemaining--;
                 do{

@@ -14,11 +14,12 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
 /**
+ * This JFrame shows the processes as their execution is being simulated. Different text panes are present to update the
+ * stats of the processes.
  *
- * @author evilc
+ * @author Sarah Pierson
  */
 public class GUI extends javax.swing.JFrame {
-    Vector<Process> allProcesses = new Vector<Process>(5);
     PriorityQueue<Process> pqc_temp;
     int CPU;
     String execStatus;
@@ -26,6 +27,7 @@ public class GUI extends javax.swing.JFrame {
     boolean alreadyStarted = false;
     boolean paused = false;
     int pollRateVal = 0;
+
     /**
      * Creates new form GUI
      */
@@ -76,8 +78,8 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        SystemStatus.setText("System Status");
+        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        SystemStatus.setText("System Paused");
 
         pollRateInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -198,25 +200,27 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Sets the temporary process queue to a copy of the one created in Simulation.
+     * Used for initially populating the table of processes.
+     * @param input The priority queue of processes
+     */
     void set_pqc(PriorityQueue<Process> input)
     {
         pqc_temp = new PriorityQueue<>(input);
-        //System.out.println("TEST");
     }
     
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
-        //String temp = allProcesses.get(0).getID();
+        SystemStatus.setText("System Running");
+
         StartButton.setEnabled(false);
         PauseButton.setEnabled(true);
 
-        
+        pollRateVal = Integer.parseInt(pollRateInput.getText());
+
         if (alreadyStarted == false)
         {
-            pollRateVal = Integer.parseInt(pollRateInput.getText());
-            //allProcesses.addElement(pqc_temp.poll());
-            //allProcesses.addElement(pqc_temp.poll());
-            //allProcesses.addElement(pqc_temp.poll());
             DefaultTableModel model = (DefaultTableModel) Table1.getModel();
 
             int pqc_temp_size = pqc_temp.size();
@@ -251,6 +255,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
         // TODO add your handling code here:
+        SystemStatus.setText("System Paused");
         paused = true;
         PauseButton.setEnabled(false);
         StartButton.setEnabled(true);

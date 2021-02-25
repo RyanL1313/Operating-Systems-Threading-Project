@@ -6,10 +6,16 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The Simulation class creates the Thread to manage the processes and update the GUI after a process completes execution.
+ *
+ * @author Ryan Lynch, Braden McGee, Sarah Pierson
  */
 class Simulation {
     //static PriorityQueue<Process> processQueue = new ProcessQueueManager().getProcessQueue();
 
+    /**
+     * Main driver for the program.
+     * @param args Console arguments
+     */
     public static void main(String[] args)
     {
         double throughput = 0;
@@ -33,14 +39,16 @@ class Simulation {
             }
         }
 
+        // Simulate the execution of processes until the processQueue is empty
         while (!processQueue.isEmpty())
         {
+            pollRateVal = gui.getPollRateVal(); // Get the poll rate value again in case it has changed
             Process currProcess = processQueue.poll(); // Retrieves the top-priority process and removes it from processQueue
             currProcess.setPollRate(pollRateVal);
             currProcess.setGUI(gui);
             Thread processThread = new Thread(currProcess);
             processThread.start();
-            System.out.println(currProcess.getID() + " is running");
+            //System.out.println(currProcess.getID() + " is running");
 
             try {
                 processThread.join();
@@ -56,9 +64,6 @@ class Simulation {
                     e.printStackTrace();
                 }
             }
-
-            // Debugging purposes
-            System.out.println(currProcess.getID() + " ran for " + currProcess.getSerTime() + " seconds\n");
 
             numProcessesComplete++;
             timeElapsed += currProcess.getSerTime();
