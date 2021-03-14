@@ -285,7 +285,7 @@ public class GUI extends javax.swing.JFrame {
         model.setValueAt(serviceTime, row, 2);
         //model.setValueAt(finishTime, row, 3);
         //model.setValueAt(TAT, row, 4);
-        //model.setValueAt(nTAT, row, 4);
+        //model.setValueAt(nTAT, row, 5);
         
     }
     
@@ -334,7 +334,7 @@ public class GUI extends javax.swing.JFrame {
     
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
-        setTable2();
+        //setTable2();
         SystemStatus.setText("System Running");
 
         StartButton.setEnabled(false);
