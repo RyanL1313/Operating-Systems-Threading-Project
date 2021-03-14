@@ -25,6 +25,7 @@ public class GUI extends javax.swing.JFrame {
     String execStatus;
     double timeRemaining;
     boolean alreadyStarted = false;
+    boolean alreadyStarted_table2 = false;
     boolean paused = false;
     int pollRateVal = 0;
 
@@ -49,7 +50,7 @@ public class GUI extends javax.swing.JFrame {
         StartButton = new javax.swing.JButton();
         PauseButton = new javax.swing.JButton();
         SystemStatus = new javax.swing.JLabel();
-        pollRateInput = new javax.swing.JTextField("1000");
+        pollRateInput = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -57,8 +58,13 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         StatusPane1 = new javax.swing.JTextPane();
         jLabel4 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        Table2 = new javax.swing.JTable();
+        jScrollPane5 = new javax.swing.JScrollPane();
         StatusPane2 = new javax.swing.JTextPane();
+        jLabel5 = new javax.swing.JLabel();
+        currentThroughputInput = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -78,14 +84,15 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        SystemStatus.setText("System Paused");
+        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        SystemStatus.setText("System Status");
 
         pollRateInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pollRateInputActionPerformed(evt);
             }
         });
+
         jLabel3.setText("1 time unit =");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -138,8 +145,41 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel4.setText("ms");
 
+        Table2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {"", null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(Table2);
+
         StatusPane2.setEditable(false);
-        jScrollPane3.setViewportView(StatusPane2);
+        jScrollPane5.setViewportView(StatusPane2);
+
+        jLabel5.setText("Current Throughput:");
+
+        currentThroughputInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                currentThroughputInputActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("proccess/unit of time");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -149,29 +189,40 @@ public class GUI extends javax.swing.JFrame {
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(74, 74, 74)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(currentThroughputInput, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel6)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(10, 10, 10)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(10, 10, 10)
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(PauseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(SystemStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(39, 39, 39))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(43, 43, 43))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -181,20 +232,29 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(PauseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SystemStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3)
-                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(currentThroughputInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addContainerGap())
         );
 
         pack();
@@ -210,8 +270,71 @@ public class GUI extends javax.swing.JFrame {
         pqc_temp = new PriorityQueue<>(input);
     }
     
+    void updateRowTable2(int row, Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) Table2.getModel();
+        String processID = processInput.getID();
+        int arrivalTime = processInput.getArrTime();
+        int serviceTime = processInput.getSerTime();
+        //int finishTime = nextProcess.getFinishTime();
+        //int TAT = nextProcess.getTAT();
+        //int nTAT = nextProcess.getnTAT();
+        
+        model.setValueAt(processID, row, 0);
+        model.setValueAt(arrivalTime, row, 1);
+        model.setValueAt(serviceTime, row, 2);
+        //model.setValueAt(finishTime, row, 3);
+        //model.setValueAt(TAT, row, 4);
+        //model.setValueAt(nTAT, row, 4);
+        
+    }
+    
+    
+    void setTable2()
+    {
+
+        if (alreadyStarted_table2 == false)
+        {
+            DefaultTableModel model = (DefaultTableModel) Table2.getModel();
+
+            int pqc_temp_size = pqc_temp.size();
+
+            for (int i = 0; i < pqc_temp_size; i++)
+            {
+                Process nextProcess = pqc_temp.poll();
+                
+                int arrivalTime = nextProcess.getArrTime();
+                int serviceTime = nextProcess.getSerTime();
+                //int finishTime = nextProcess.getFinishTime();
+                //int TAT = nextProcess.getTAT();
+                //int nTAT = nextProcess.getnTAT();
+                
+                String processID = nextProcess.getID();
+                
+
+                if (i < 6) // Initially, the table has 6 rows
+                {
+                    model.setValueAt(processID, i, 0);
+                    model.setValueAt(arrivalTime, i, 1);
+                    model.setValueAt(serviceTime, i, 2);
+                    //model.setValueAt(finishTime, i, 3);
+                    //model.setValueAt(TAT, i, 4);
+                    //model.setValueAt(nTAT, i, 4);
+                }
+                else
+                {
+                    //Object[] rowInput = {processID, arrivalTime, serviceTime, finishTime, TAT, nTAT};
+                    //model.addRow(rowInput);
+                }
+
+            }
+            alreadyStarted_table2 = true;
+        }
+    }
+    
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
+        setTable2();
         SystemStatus.setText("System Running");
 
         StartButton.setEnabled(false);
@@ -269,12 +392,57 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_pollRateInputActionPerformed
 
+    private void currentThroughputInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentThroughputInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_currentThroughputInputActionPerformed
+
     public int getPollRateVal() {
         return pollRateVal;
     }
 
     public boolean getPauseState(){
         return paused;
+    }
+    
+    public void removeProcessFromTable2()
+    {
+        int numRows = Table2.getRowCount();
+
+        for (int i = 1; i < numRows; i++)
+        {
+            if (Table1.getValueAt(0, 0).toString().equals(""))
+            {
+                break; // no more values in the table
+            }
+            else if (Table1.getValueAt(i, 0).toString().equals(""))
+            {
+                Table2.setValueAt("", i - 1, 0);
+                Table2.setValueAt("", i - 1, 1);
+                Table2.setValueAt("", i - 1, 2);
+                Table2.setValueAt("", i - 1, 3);
+                Table2.setValueAt("", i - 1, 4);
+                Table2.setValueAt("", i - 1, 5);
+                break; // This row has no values; nothing to shift up
+            }
+            else
+            {
+                // Shift the process's data up one row
+                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 0);
+                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 1);
+                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 2);
+                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 3);
+                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 4);
+                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 5);
+                
+                Table2.setValueAt("", i, 0);
+                Table2.setValueAt("", i, 1);
+                Table2.setValueAt("", i, 2);
+                Table2.setValueAt("", i, 3);
+                Table2.setValueAt("", i, 4);
+                Table2.setValueAt("", i, 5);
+            }
+
+        }
     }
 
     public void removeProcessFromTable()
@@ -321,6 +489,11 @@ public class GUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+    
+    public void setCurrentThroughput(float input)
+    {
+        currentThroughputInput.setText(String.valueOf(input));
+    }
 
     public void updateCPUStats(String processID, int CPU, int timeRemaining)
     {
@@ -339,6 +512,22 @@ public class GUI extends javax.swing.JFrame {
         }
     }
   
+    public void updateCPUStats2(String processID, int CPU, int timeRemaining)
+    {
+        StyledDocument document = (StyledDocument) StatusPane2.getDocument();
+        // Cleaning Document
+        try {
+            document.remove(0, document.getLength());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        // Updating new information
+        try {
+            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton PauseButton;
@@ -347,12 +536,17 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextPane StatusPane2;
     private javax.swing.JLabel SystemStatus;
     private javax.swing.JTable Table1;
+    private javax.swing.JTable Table2;
+    private javax.swing.JTextField currentThroughputInput;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextField pollRateInput;
     // End of variables declaration//GEN-END:variables
 }
