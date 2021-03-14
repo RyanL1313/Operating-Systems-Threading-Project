@@ -3,6 +3,7 @@ package Backend;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The Simulation class creates the Thread to manage the processes and update the GUI after a process completes execution.
@@ -22,6 +23,8 @@ class Simulation {
         int numProcessesComplete = 0;
         int timeElapsed = 0;
         int pollRateVal = 0;
+        int CPU = 0; // CPU Count
+        ReentrantLock CPUlock = new ReentrantLock();
 
         ProcessQueueManager pqc = new ProcessQueueManager();
         PriorityQueue<Process> processQueue = pqc.getProcessQueue();
@@ -43,10 +46,8 @@ class Simulation {
         while (!processQueue.isEmpty())
         {
             pollRateVal = gui.getPollRateVal(); // Get the poll rate value again in case it has changed
-            Process currProcess = processQueue.poll(); // Retrieves the top-priority process and removes it from processQueue
-            currProcess.setPollRate(pollRateVal);
-            currProcess.setGUI(gui);
-            Thread processThread = new Thread(currProcess);
+            CPUThread currThread = new CPUThread(CPUlock, processQueue, gui, CPU++, pollRateVal);
+            Thread processThread = new Thread(currThread);
             processThread.start();
             //System.out.println(currProcess.getID() + " is running");
 
@@ -66,11 +67,8 @@ class Simulation {
             }
 
             numProcessesComplete++;
-            timeElapsed += currProcess.getSerTime();
-            throughput = (double)numProcessesComplete / timeElapsed;
 
             // Update the GUI after a process completes
-            gui.updateSystemStats(currProcess.getID(), currProcess.getSerTime(), throughput);
             gui.removeProcessFromTable();
 
         }
