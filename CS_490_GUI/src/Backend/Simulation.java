@@ -23,7 +23,6 @@ class Simulation {
         int numProcessesComplete = 0;
         int timeElapsed = 0;
         int pollRateVal = 0;
-        int CPU = 0; // CPU Count
         ReentrantLock CPUlock = new ReentrantLock();
 
         ProcessQueueManager pqc = new ProcessQueueManager();
@@ -42,24 +41,29 @@ class Simulation {
             }
         }
 
+        CPUThread cpu1 = new CPUThread(CPUlock, processQueue, gui, 1, pollRateVal); // Initialize CPU 1
+        CPUThread cpu2 =  new CPUThread(CPUlock, processQueue, gui, 2, pollRateVal); // Initialize CPU 2
+        Thread cpu1Thread = new Thread(cpu1); // The thread for CPU 1
+        Thread cpu2Thread = new Thread(cpu2); // The thread for CPU 2
+        cpu1Thread.start();
+        cpu2Thread.start();
+
         // Simulate the execution of processes until the processQueue is empty
         while (!processQueue.isEmpty())
         {
             pollRateVal = gui.getPollRateVal(); // Get the poll rate value again in case it has changed
-            CPUThread currThread = new CPUThread(CPUlock, processQueue, gui, CPU++, pollRateVal);
-            Thread processThread = new Thread(currThread);
-            processThread.start();
-            //System.out.println(currProcess.getID() + " is running");
 
             try {
-                processThread.join();
+                cpu1Thread.join();
+                cpu2Thread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             while(gui.getPauseState() == true){
                 try {
-                    processThread.interrupt();
+                    cpu1Thread.interrupt();
+                    cpu2Thread.interrupt();
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -69,7 +73,7 @@ class Simulation {
             numProcessesComplete++;
 
             // Update the GUI after a process completes
-            gui.removeProcessFromTable();
+            //gui.removeProcessFromTable();
 
         }
 

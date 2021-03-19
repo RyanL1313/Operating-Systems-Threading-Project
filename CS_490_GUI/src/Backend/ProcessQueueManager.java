@@ -12,7 +12,7 @@ public class ProcessQueueManager {
 
     // This priority queue is really just a regular FIFO queue on the first iteration of this program (the comparator orders the processes by arrival time).
     private PriorityQueue<Process> processQueue = new PriorityQueue(new Comparator<Process>() {
-        public int compare(Process p1, Process p2) { // This anonymous function will be changed in subsequent versions of this program (priority instead of FIFO)
+        public int compare(Process p1, Process p2) { // This anonymous function will be changed in version 3 of this program (priority instead of FIFO)
             return p1.getArrTime() < p2.getArrTime() ? -1 : p1.getArrTime() > p2.getArrTime() ? 1 : 0; // lower arrTime == higher priority
         }
     });

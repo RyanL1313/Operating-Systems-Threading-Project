@@ -28,7 +28,6 @@ public class Parser {
         // Display a dialog box to retrieve the full file path, then initialize the File object
         processPathName = JOptionPane.showInputDialog("Enter the full path of your processes file");
         inFile = new File(processPathName);
-
         // Initialize the file Scanner
         try {
             inFileScanner = new Scanner(inFile);
