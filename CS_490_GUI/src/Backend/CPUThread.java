@@ -57,26 +57,29 @@ public class CPUThread implements Runnable {
      *
      * Each CPU has its own ready queue.
      *
-     * This method is called when it is determined that the total run time (time units) is equal to the top priority
-     * process's arrival time.
+     * If a process's arrival time equals the total run time, it's time for the process to be brought into the ready
+     * queue. This method tries to do that, but only 1 CPU will gain access to the lock first and successfully get
+     * the process for its ready queue.
      *
      * If another CPU calls this method and gets blocked due to the lock being set, the process queue may be empty when
      * the other CPU gains access to this method. Therefore, an extra check is made in this method to make sure the
      * process queue is not empty before peeking and polling it.
      *
-     * The only time the process queue can be modified is in this mutually exclusive method (as far as I can tell).
+     * The only time the process queue can be modified is in this mutually exclusive method.
      * We don't have to worry about mutually exclusive access for the ready queues because each CPU has its own.
      */
-    synchronized private void addToReadyQueue() {
+    synchronized private void tryAddToReadyQueue() {
         lock.lock();
 
         try {
 
             if (processQueue.isEmpty()) // Nothing to add to the ready queue; return from the method
                 return;
+
             // Add the process to the ready queue if another CPU has not already taken it
             if (processQueue.peek().getArrTime() == runTime) // If this is false, another CPU took the process that starts at this time
                 readyQueue.add(processQueue.poll()); // Add the process to the ready queue
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -107,15 +110,9 @@ public class CPUThread implements Runnable {
             if (readyQueue.isEmpty())
             {
                 // If a process is ready to be added to the ready queue, try to add it to this CPU's ready queue
-                if (!processQueue.isEmpty()) {
-                    if (processQueue.peek().getArrTime() == runTime)
-                        addToReadyQueue();
-                }
-                else
-                    continue; // Continue to the loop, where the thread will get terminated when the condition fails
-                if (!readyQueue.isEmpty()) // A process was successfully loaded into the ready queue from the previous step
-                    continue; // Go back to the top of the loop
-                else // Still no processes in the ready queue, sleep for one time unit and try again
+                tryAddToReadyQueue();
+
+                if (readyQueue.isEmpty()) // Still no processes in the ready queue, sleep for one time unit and try again
                 {
 
                     try {
@@ -143,10 +140,7 @@ public class CPUThread implements Runnable {
                         runTime++;
 
                         // If a process is ready to be added to the ready queue, try to add it to this CPU's ready queue
-                        if (!processQueue.isEmpty()) {
-                            if (processQueue.peek().getArrTime() == runTime)
-                                addToReadyQueue();
-                        }
+                        tryAddToReadyQueue();
 
                         do {
                             paused = gui.getPauseState();
