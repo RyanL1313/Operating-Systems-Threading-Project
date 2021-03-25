@@ -58,7 +58,7 @@ class Simulation {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            // Pauseloop
             while(gui.getPauseState() == true){
                 try {
                     cpu1Thread.interrupt();

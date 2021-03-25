@@ -81,8 +81,8 @@ public class CPUThread implements Runnable {
         }
     }
 
-    /*
-    * Updates the completed processes for the static variable numProcessesCompleted
+    /**
+    * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI
     */
     synchronized private void updateCompletedProcesses() {
         GUIlock.lock();
@@ -151,14 +151,16 @@ public class CPUThread implements Runnable {
 
                     System.out.println("CPU " + CPU + ": " + process.getID() + " - " + timeRemaining + " units remaining");
 
-                    // Update the corresponding CPU window
-                    if (CPU == 1)
-                       gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                    // Update the corresponding CPU window, only CPU1 updates throughput
+                    if (CPU == 1) {
+                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                        gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
+                    }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
                 }
 
-                gui.removeProcessFromTable(); // Process done, remove it from the process queue table
+                gui.removeProcessFromTable(); // Process done, updating GUI
                 updateCompletedProcesses();
                 process = null;
             } catch (InterruptedException e) {

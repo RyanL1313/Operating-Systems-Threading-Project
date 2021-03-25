@@ -35,7 +35,7 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
         initComponents();
         StatusPane1.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
-        StatusPane2.setText("System Log:\n\n");
+        StatusPane2.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
     }
 
     /**
