@@ -269,23 +269,32 @@ public class GUI extends javax.swing.JFrame {
     {
         pqc_temp = new PriorityQueue<>(input);
     }
-    
+
     void updateRowTable2(int row, Process processInput, int finishTime)
     {
+
         DefaultTableModel model = (DefaultTableModel) Table2.getModel();
         String processID = processInput.getID();
         int arrivalTime = processInput.getArrTime();
         int serviceTime = processInput.getSerTime();
         int TAT = finishTime-arrivalTime;
         float nTAT = (float)TAT/(float)serviceTime;
-        
-        model.setValueAt(processID, row, 0);
-        model.setValueAt(arrivalTime, row, 1);
-        model.setValueAt(serviceTime, row, 2);
-        model.setValueAt(finishTime, row, 3);
-        model.setValueAt(TAT, row, 4);
-        model.setValueAt(nTAT, row, 5);
-        
+
+        if (row <= 5)
+        {
+            model.setValueAt(processID, row, 0);
+            model.setValueAt(arrivalTime, row, 1);
+            model.setValueAt(serviceTime, row, 2);
+            model.setValueAt(finishTime, row, 3);
+            model.setValueAt(TAT, row, 4);
+            model.setValueAt(nTAT, row, 5);
+        }
+        else
+        {
+            Object[] rowInput = {processID, arrivalTime, serviceTime, finishTime, TAT, nTAT};
+            model.addRow(rowInput);
+        }
+
     }
     
     
@@ -444,31 +453,16 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
-    public void removeProcessFromTable()
+    public void removeProcessFromTable(String processID)
     {
         int numRows = Table1.getRowCount();
 
-        for (int i = 1; i < numRows; i++)
-        {
-            if (Table1.getValueAt(0, 0).toString().equals(""))
-            {
-                break; // no more values in the table
+        for(int i = 0; i < numRows; i++) {
+            if (Table1.getValueAt(i,0).toString().equals(processID)) {
+                // Removes row from table and breaks
+                ((DefaultTableModel)Table1.getModel()).removeRow(i);
+                break;
             }
-            else if (Table1.getValueAt(i, 0).toString().equals(""))
-            {
-                Table1.setValueAt("", i - 1, 0);
-                Table1.setValueAt("", i - 1, 1);
-                break; // This row has no values; nothing to shift up
-            }
-            else
-            {
-                // Shift the process's data up one row
-                Table1.setValueAt(Table1.getValueAt(i, 0), i - 1, 0);
-                Table1.setValueAt(Table1.getValueAt(i, 1), i - 1, 1);
-                Table1.setValueAt("", i, 0);
-                Table1.setValueAt("", i, 1);
-            }
-
         }
     }
 

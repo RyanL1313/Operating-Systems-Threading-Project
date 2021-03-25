@@ -138,6 +138,14 @@ public class CPUThread implements Runnable {
 
             try {
                 while (timeRemaining > 0) {
+                    // Update the corresponding CPU window, only CPU1 updates throughput
+                    if (CPU == 1) {
+                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                        gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
+                    }
+                    else if (CPU == 2)
+                        gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
+
                     Thread.sleep((long) (gui.getPollRateVal())); // Sleeps for the poll rate in ms, then updates timeRemaining for this process
 
                     timeRemaining--;
@@ -150,8 +158,7 @@ public class CPUThread implements Runnable {
                     } while (paused);
 
                     System.out.println("CPU " + CPU + ": " + process.getID() + " - " + timeRemaining + " units remaining");
-
-                    // Update the corresponding CPU window, only CPU1 updates throughput
+                    // Update the corresponding CPU window after execution, only CPU1 updates throughput
                     if (CPU == 1) {
                         gui.updateCPUStats(process.getID(), CPU, timeRemaining);
                         gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
@@ -160,7 +167,7 @@ public class CPUThread implements Runnable {
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
                 }
 
-                gui.removeProcessFromTable(); // Process done, updating GUI
+                gui.removeProcessFromTable(process.getID()); // Process done, updating GUI
                 updateCompletedProcesses();
                 process = null;
             } catch (InterruptedException e) {
