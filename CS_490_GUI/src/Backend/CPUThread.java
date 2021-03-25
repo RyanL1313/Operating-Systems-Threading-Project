@@ -17,15 +17,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class CPUThread implements Runnable {
     private Process process; // The current process this CPU is executing
     private PriorityQueue<Process> processQueue; // The shared queue of all processes run by the simulation
-    private PriorityQueue<Process> readyQueue = new PriorityQueue((Comparator<Process>) (p1, p2) -> { // The queue of arrived and waiting processes
-        return p1.getArrTime() < p2.getArrTime() ? -1 : p1.getArrTime() > p2.getArrTime() ? 1 : 0;
-    });
     private int runTime; // The elapsed time units this CPU thread has been running
     private int pollRate; // The amount of milliseconds 1 time unit is
     private int CPU; // CPU ID
     private int TAT; // Turn around time
     private GUI gui; // The GUI window to display the data
-    static private ReentrantLock lock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
+    static private ReentrantLock CPUlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
+    static private ReentrantLock GUIlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
+    static private int numProcessesCompleted = 0;
     private boolean occupied = false; // Flag for if the CPU is occupied
 
     /**
@@ -42,9 +41,10 @@ public class CPUThread implements Runnable {
      *  Parameterized Constructor
      *  Pass in the processQueue
      */
-    public CPUThread(ReentrantLock lock, PriorityQueue<Process> processQueue, GUI gui, int CPU, int pollRate) {
+    public CPUThread(ReentrantLock CPUlock, ReentrantLock GUIlock, PriorityQueue<Process> processQueue, GUI gui, int CPU, int pollRate) {
         this.processQueue = processQueue;
-        this.lock = lock;
+        this.CPUlock = CPUlock;
+        this.GUIlock = GUIlock;
         runTime = 0;
         TAT = 0;
         this.gui = gui;
@@ -69,21 +69,30 @@ public class CPUThread implements Runnable {
      * We don't have to worry about mutually exclusive access for the ready queues because each CPU has its own.
      */
     synchronized private void tryAddToReadyQueue() {
-        lock.lock();
-
+        CPUlock.lock();
         try {
-
             if (processQueue.isEmpty()) // Nothing to add to the ready queue; return from the method
                 return;
-
-            // Add the process to the ready queue if another CPU has not already taken it
-            if (processQueue.peek().getArrTime() == runTime) // If this is false, another CPU took the process that starts at this time
-                readyQueue.add(processQueue.poll()); // Add the process to the ready queue
-
+            else process = processQueue.poll();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            lock.unlock();
+            CPUlock.unlock();
+        }
+    }
+
+    /*
+    * Updates the completed processes for the static variable numProcessesCompleted
+    */
+    synchronized private void updateCompletedProcesses() {
+        GUIlock.lock();
+        try {
+            gui.updateRowTable2(numProcessesCompleted, process, runTime);
+            numProcessesCompleted++;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            GUIlock.unlock();
         }
     }
 
@@ -95,6 +104,11 @@ public class CPUThread implements Runnable {
     {
         return runTime;
     }
+    public int getNumProcessesCompleted()
+    {
+        return numProcessesCompleted;
+    }
+    public void setPollRate(int pollRate) { this.pollRate = pollRate; }
 
     /**
      * Simulates the running of a process.
@@ -105,64 +119,51 @@ public class CPUThread implements Runnable {
      */
     @Override
     public void run() {
-        while (!processQueue.isEmpty() || !readyQueue.isEmpty()) // CPU runs until the process and ready queues are empty
+        while (!processQueue.isEmpty()) // CPU runs until the process and ready queues are empty
         {
-            if (readyQueue.isEmpty())
-            {
-                // If a process is ready to be added to the ready queue, try to add it to this CPU's ready queue
-                tryAddToReadyQueue();
-
-                if (readyQueue.isEmpty()) // Still no processes in the ready queue, sleep for one time unit and try again
-                {
-
-                    try {
-                        Thread.sleep((long) (gui.getPollRateVal()));
-                        runTime++; // A time unit of waiting just happened; update the run time
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else // If the ready queue has processes waiting, execute the top priority one
-            {
-                process = readyQueue.poll(); // Get the next process in the ready queue
-                //System.out.println("Executing " + process.getID());
-                //pollRate = gui.getPollRateVal(); // Get the time unit input
-                int timeRemaining = process.getSerTime(); // Get how long the process will occupy the CPU
-
-                boolean paused = false;
-
+            tryAddToReadyQueue();
+            // Waitloop until runtime = arrTime
+            while(runTime < process.getArrTime()) {
                 try {
-                    while (timeRemaining > 0) {
-                        Thread.sleep((long) (gui.getPollRateVal())); // Sleeps for the poll rate in ms, then updates timeRemaining for this process
-
-                        timeRemaining--;
-                        runTime++;
-
-                        // If a process is ready to be added to the ready queue, try to add it to this CPU's ready queue
-                        tryAddToReadyQueue();
-
-                        do {
-                            paused = gui.getPauseState();
-
-                            if (paused) Thread.sleep(50);
-                        } while (paused);
-
-                        System.out.println("CPU " + CPU + ": " + process.getID() + " - " + timeRemaining + " units remaining");
-
-                        // Update the corresponding CPU window
-                        if (CPU == 1)
-                           gui.updateCPUStats(process.getID(), CPU, timeRemaining);
-                        else if (CPU == 2)
-                            gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
-
-                    }
-
-                    gui.removeProcessFromTable(); // Process done, remove it from the process queue table
+                    Thread.sleep((long) (gui.getPollRateVal()));
+                    runTime++; // A time unit of waiting just happened; update the run time
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+            pollRate = gui.getPollRateVal();
+            int timeRemaining = process.getSerTime(); // Get how long the process will occupy the CPU
+
+            boolean paused = false;
+
+            try {
+                while (timeRemaining > 0) {
+                    Thread.sleep((long) (gui.getPollRateVal())); // Sleeps for the poll rate in ms, then updates timeRemaining for this process
+
+                    timeRemaining--;
+                    runTime++;
+
+                    do {
+                        paused = gui.getPauseState();
+
+                        if (paused) Thread.sleep(50);
+                    } while (paused);
+
+                    System.out.println("CPU " + CPU + ": " + process.getID() + " - " + timeRemaining + " units remaining");
+
+                    // Update the corresponding CPU window
+                    if (CPU == 1)
+                       gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                    else if (CPU == 2)
+                        gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
+                }
+
+                gui.removeProcessFromTable(); // Process done, remove it from the process queue table
+                updateCompletedProcesses();
+                process = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+             }
         }
     }
 }

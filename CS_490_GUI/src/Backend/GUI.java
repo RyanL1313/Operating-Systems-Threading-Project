@@ -50,7 +50,7 @@ public class GUI extends javax.swing.JFrame {
         StartButton = new javax.swing.JButton();
         PauseButton = new javax.swing.JButton();
         SystemStatus = new javax.swing.JLabel();
-        pollRateInput = new javax.swing.JTextField();
+        pollRateInput = new javax.swing.JTextField("1000");
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -270,22 +270,21 @@ public class GUI extends javax.swing.JFrame {
         pqc_temp = new PriorityQueue<>(input);
     }
     
-    void updateRowTable2(int row, Process processInput)
+    void updateRowTable2(int row, Process processInput, int finishTime)
     {
         DefaultTableModel model = (DefaultTableModel) Table2.getModel();
         String processID = processInput.getID();
         int arrivalTime = processInput.getArrTime();
         int serviceTime = processInput.getSerTime();
-        //int finishTime = nextProcess.getFinishTime();
-        //int TAT = nextProcess.getTAT();
-        //int nTAT = nextProcess.getnTAT();
+        int TAT = finishTime-arrivalTime;
+        float nTAT = (float)TAT/(float)serviceTime;
         
         model.setValueAt(processID, row, 0);
         model.setValueAt(arrivalTime, row, 1);
         model.setValueAt(serviceTime, row, 2);
-        //model.setValueAt(finishTime, row, 3);
-        //model.setValueAt(TAT, row, 4);
-        //model.setValueAt(nTAT, row, 5);
+        model.setValueAt(finishTime, row, 3);
+        model.setValueAt(TAT, row, 4);
+        model.setValueAt(nTAT, row, 5);
         
     }
     

@@ -24,6 +24,7 @@ class Simulation {
         int timeElapsed = 0;
         int pollRateVal = 0;
         ReentrantLock CPUlock = new ReentrantLock();
+        ReentrantLock GUIlock = new ReentrantLock();
 
         ProcessQueueManager pqc = new ProcessQueueManager();
         PriorityQueue<Process> processQueue = pqc.getProcessQueue();
@@ -41,8 +42,8 @@ class Simulation {
             }
         }
 
-        CPUThread cpu1 = new CPUThread(CPUlock, processQueue, gui, 1, pollRateVal); // Initialize CPU 1
-        CPUThread cpu2 =  new CPUThread(CPUlock, processQueue, gui, 2, pollRateVal); // Initialize CPU 2
+        CPUThread cpu1 = new CPUThread(CPUlock, GUIlock, processQueue, gui, 1, pollRateVal); // Initialize CPU 1
+        CPUThread cpu2 =  new CPUThread(CPUlock, GUIlock, processQueue, gui, 2, pollRateVal); // Initialize CPU 2
         Thread cpu1Thread = new Thread(cpu1); // The thread for CPU 1
         Thread cpu2Thread = new Thread(cpu2); // The thread for CPU 2
         cpu1Thread.start();
@@ -51,8 +52,6 @@ class Simulation {
         // Simulate the execution of processes until the processQueue is empty
         while (!processQueue.isEmpty())
         {
-            pollRateVal = gui.getPollRateVal(); // Get the poll rate value again in case it has changed
-
             try {
                 cpu1Thread.join();
                 cpu2Thread.join();
@@ -69,14 +68,6 @@ class Simulation {
                     e.printStackTrace();
                 }
             }
-
-            numProcessesComplete++;
-
-            // Update the GUI after a process completes
-            //gui.removeProcessFromTable();
-
         }
-
-        
     }
 }
