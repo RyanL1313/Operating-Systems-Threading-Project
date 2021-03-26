@@ -1,5 +1,3 @@
-package Backend;
-
 /**
  *<h1>process Class</h1>
  * Stores process data <br>
@@ -34,17 +32,17 @@ public class Process {
         serTime = Integer.parseInt(processAttributes[2]);
         priority = Integer.parseInt(processAttributes[3]);
     }
-    
+
     public void setID(String input)
     {
         ID = input;
     }
-    
+
     public void setArrTime(int input)
     {
         arrTime = input;
     }
-    
+
     public void setSerTime(int input)
     {
         serTime = input;

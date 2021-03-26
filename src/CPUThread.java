@@ -1,5 +1,3 @@
-package Backend;
-
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -74,8 +72,8 @@ public class CPUThread implements Runnable {
     }
 
     /**
-    * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI and the throughput
-    */
+     * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI and the throughput
+     */
     synchronized private void updateCompletedProcesses() {
         GUIlock.lock();
         try {
@@ -162,7 +160,7 @@ public class CPUThread implements Runnable {
                 process = null;
             } catch (InterruptedException e) {
                 e.printStackTrace();
-             }
+            }
         }
 
         gui.displayCPUFinishMessage(CPU); // No more processes left for the CPU to grab, print its finished message

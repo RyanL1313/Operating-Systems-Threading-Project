@@ -1,5 +1,3 @@
-package Backend;
-
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -51,3 +49,4 @@ public class ProcessQueueManager {
         return processQueue;
     }
 }
+
