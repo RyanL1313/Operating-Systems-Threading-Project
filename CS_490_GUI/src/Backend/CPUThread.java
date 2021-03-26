@@ -1,6 +1,5 @@
 package Backend;
 
-import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,19 +19,16 @@ public class CPUThread implements Runnable {
     private int runTime; // The elapsed time units this CPU thread has been running
     private int pollRate; // The amount of milliseconds 1 time unit is
     private int CPU; // CPU ID
-    private int TAT; // Turn around time
     private GUI gui; // The GUI window to display the data
     static private ReentrantLock CPUlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
-    static private ReentrantLock GUIlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
-    static private int numProcessesCompleted = 0;
-    private boolean occupied = false; // Flag for if the CPU is occupied
+    static private ReentrantLock GUIlock; // Lock to allow for mutual exclusion when updating the bottom stats table
+    static private int numProcessesCompleted = 0; // Number of processes completed by both CPUs combined
 
     /**
      * Default Constructor
      */
     public CPUThread() {
         runTime = 0;
-        TAT = 0;
         pollRate = 0;
         CPU = 0;
     }
@@ -46,7 +42,6 @@ public class CPUThread implements Runnable {
         this.CPUlock = CPUlock;
         this.GUIlock = GUIlock;
         runTime = 0;
-        TAT = 0;
         this.gui = gui;
         this.pollRate = pollRate;
         this.CPU = CPU;
@@ -54,8 +49,6 @@ public class CPUThread implements Runnable {
 
     /**
      * Adds a process to the ready queue in a mutually exclusive manner.
-     *
-     * Each CPU has its own ready queue.
      *
      * If a process's arrival time equals the total run time, it's time for the process to be brought into the ready
      * queue. This method tries to do that, but only 1 CPU will gain access to the lock first and successfully get
@@ -66,7 +59,6 @@ public class CPUThread implements Runnable {
      * process queue is not empty before peeking and polling it.
      *
      * The only time the process queue can be modified is in this mutually exclusive method.
-     * We don't have to worry about mutually exclusive access for the ready queues because each CPU has its own.
      */
     synchronized private void tryAddToReadyQueue() {
         CPUlock.lock();
@@ -82,13 +74,14 @@ public class CPUThread implements Runnable {
     }
 
     /**
-    * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI
+    * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI and the throughput
     */
     synchronized private void updateCompletedProcesses() {
         GUIlock.lock();
         try {
             gui.updateRowTable2(numProcessesCompleted, process, runTime);
             numProcessesCompleted++;
+            gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -138,10 +131,9 @@ public class CPUThread implements Runnable {
 
             try {
                 while (timeRemaining > 0) {
-                    // Update the corresponding CPU window, only CPU1 updates throughput
+                    // Update the corresponding CPU window
                     if (CPU == 1) {
                         gui.updateCPUStats(process.getID(), CPU, timeRemaining);
-                        gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
@@ -157,11 +149,9 @@ public class CPUThread implements Runnable {
                         if (paused) Thread.sleep(50);
                     } while (paused);
 
-                    System.out.println("CPU " + CPU + ": " + process.getID() + " - " + timeRemaining + " units remaining");
-                    // Update the corresponding CPU window after execution, only CPU1 updates throughput
+                    // Update the corresponding CPU window after execution
                     if (CPU == 1) {
                         gui.updateCPUStats(process.getID(), CPU, timeRemaining);
-                        gui.setCurrentThroughput((float) numProcessesCompleted / (float) runTime);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);

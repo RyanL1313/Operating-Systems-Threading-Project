@@ -81,7 +81,7 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         SystemStatus.setText("System Status");
 
         pollRateInput.addActionListener(new java.awt.event.ActionListener() {
@@ -176,7 +176,7 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel6.setText("proccess/unit of time");
+        jLabel6.setText("processes/unit of time");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -274,8 +274,8 @@ public class GUI extends javax.swing.JFrame {
         String processID = processInput.getID();
         int arrivalTime = processInput.getArrTime();
         int serviceTime = processInput.getSerTime();
-        int TAT = finishTime-arrivalTime;
-        float nTAT = (float)TAT/(float)serviceTime;
+        int TAT = finishTime - arrivalTime;
+        float nTAT = (float)TAT / (float)serviceTime;
         String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
 
         if (row <= 5)
@@ -366,6 +366,10 @@ public class GUI extends javax.swing.JFrame {
         return paused;
     }
 
+    /**
+     * Removes a process from the wait queue table by searching for a process ID and removing the associated row.
+     * @param processID The ID of the process
+     */
     public void removeProcessFromTable(String processID)
     {
         int numRows = Table1.getRowCount();
