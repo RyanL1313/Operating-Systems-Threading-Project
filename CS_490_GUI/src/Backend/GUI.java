@@ -5,9 +5,7 @@
  */
 package Backend;
 
-import java.util.ArrayList;
 import java.util.PriorityQueue;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
@@ -25,7 +23,6 @@ public class GUI extends javax.swing.JFrame {
     String execStatus;
     double timeRemaining;
     boolean alreadyStarted = false;
-    boolean alreadyStarted_table2 = false;
     boolean paused = false;
     int pollRateVal = 0;
 
@@ -279,6 +276,7 @@ public class GUI extends javax.swing.JFrame {
         int serviceTime = processInput.getSerTime();
         int TAT = finishTime-arrivalTime;
         float nTAT = (float)TAT/(float)serviceTime;
+        String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
 
         if (row <= 5)
         {
@@ -287,62 +285,18 @@ public class GUI extends javax.swing.JFrame {
             model.setValueAt(serviceTime, row, 2);
             model.setValueAt(finishTime, row, 3);
             model.setValueAt(TAT, row, 4);
-            model.setValueAt(nTAT, row, 5);
+            model.setValueAt(sNTAT, row, 5);
         }
         else
         {
-            Object[] rowInput = {processID, arrivalTime, serviceTime, finishTime, TAT, nTAT};
+            Object[] rowInput = {processID, arrivalTime, serviceTime, finishTime, TAT, sNTAT};
             model.addRow(rowInput);
         }
 
     }
     
-    
-    void setTable2()
-    {
-
-        if (alreadyStarted_table2 == false)
-        {
-            DefaultTableModel model = (DefaultTableModel) Table2.getModel();
-
-            int pqc_temp_size = pqc_temp.size();
-
-            for (int i = 0; i < pqc_temp_size; i++)
-            {
-                Process nextProcess = pqc_temp.poll();
-                
-                int arrivalTime = nextProcess.getArrTime();
-                int serviceTime = nextProcess.getSerTime();
-                //int finishTime = nextProcess.getFinishTime();
-                //int TAT = nextProcess.getTAT();
-                //int nTAT = nextProcess.getnTAT();
-                
-                String processID = nextProcess.getID();
-                
-
-                if (i < 6) // Initially, the table has 6 rows
-                {
-                    model.setValueAt(processID, i, 0);
-                    model.setValueAt(arrivalTime, i, 1);
-                    model.setValueAt(serviceTime, i, 2);
-                    //model.setValueAt(finishTime, i, 3);
-                    //model.setValueAt(TAT, i, 4);
-                    //model.setValueAt(nTAT, i, 4);
-                }
-                else
-                {
-                    //Object[] rowInput = {processID, arrivalTime, serviceTime, finishTime, TAT, nTAT};
-                    //model.addRow(rowInput);
-                }
-
-            }
-            alreadyStarted_table2 = true;
-        }
-    }
-    
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         // TODO add your handling code here:
-        //setTable2();
         SystemStatus.setText("System Running");
 
         StartButton.setEnabled(false);
@@ -411,47 +365,6 @@ public class GUI extends javax.swing.JFrame {
     public boolean getPauseState(){
         return paused;
     }
-    
-    public void removeProcessFromTable2()
-    {
-        int numRows = Table2.getRowCount();
-
-        for (int i = 1; i < numRows; i++)
-        {
-            if (Table1.getValueAt(0, 0).toString().equals(""))
-            {
-                break; // no more values in the table
-            }
-            else if (Table1.getValueAt(i, 0).toString().equals(""))
-            {
-                Table2.setValueAt("", i - 1, 0);
-                Table2.setValueAt("", i - 1, 1);
-                Table2.setValueAt("", i - 1, 2);
-                Table2.setValueAt("", i - 1, 3);
-                Table2.setValueAt("", i - 1, 4);
-                Table2.setValueAt("", i - 1, 5);
-                break; // This row has no values; nothing to shift up
-            }
-            else
-            {
-                // Shift the process's data up one row
-                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 0);
-                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 1);
-                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 2);
-                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 3);
-                Table2.setValueAt(Table1.getValueAt(i, 0), i - 1, 4);
-                Table2.setValueAt(Table1.getValueAt(i, 1), i - 1, 5);
-                
-                Table2.setValueAt("", i, 0);
-                Table2.setValueAt("", i, 1);
-                Table2.setValueAt("", i, 2);
-                Table2.setValueAt("", i, 3);
-                Table2.setValueAt("", i, 4);
-                Table2.setValueAt("", i, 5);
-            }
-
-        }
-    }
 
     public void removeProcessFromTable(String processID)
     {
@@ -466,28 +379,21 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
-    public void updateSystemStats(String processID, int serviceTime, double throughput)
-    {
-        StyledDocument document = (StyledDocument) StatusPane2.getDocument();
-
-        try {
-            document.insertString(document.getLength(), processID + " is complete and took " + serviceTime + " time units.\n", null);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            document.insertString(document.getLength(), "Current throughput is " + String.format("%.2f", throughput) + " processes completed per time unit.\n\n", null);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-    }
-    
+    /**
+     * Displays the current throughput of the system.
+     * @param input The throughput
+     */
     public void setCurrentThroughput(float input)
     {
-        currentThroughputInput.setText(String.valueOf(input));
+        currentThroughputInput.setText(String.format("%.3f", input));
     }
 
+    /**
+     * Updates the displayed stats for the first CPU.
+     * @param processID The process's ID
+     * @param CPU The CPU number
+     * @param timeRemaining The number of time units left for this process to finish
+     */
     public void updateCPUStats(String processID, int CPU, int timeRemaining)
     {
         StyledDocument document = (StyledDocument) StatusPane1.getDocument();
@@ -504,7 +410,13 @@ public class GUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-  
+
+    /**
+     * Updates the displayed stats for the second CPU.
+     * @param processID The process's ID
+     * @param CPU The CPU number
+     * @param timeRemaining The number of time units left for this process to finish
+     */
     public void updateCPUStats2(String processID, int CPU, int timeRemaining)
     {
         StyledDocument document = (StyledDocument) StatusPane2.getDocument();
@@ -519,6 +431,38 @@ public class GUI extends javax.swing.JFrame {
             document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * When there are no more processes for the CPU to grab, the respective CPU status pane will
+     * display the finished message.
+     *
+     * @param CPU The CPU that has finished
+     */
+    public void displayCPUFinishMessage(int CPU)
+    {
+        StyledDocument document = null;
+
+        if (CPU == 1) // CPU 1 was passed in as a parameter
+            document = (StyledDocument) StatusPane1.getDocument();
+        else if (CPU == 2) // CPU 2 was passed in as a parameter
+            document = (StyledDocument) StatusPane2.getDocument();
+
+        // Cleaning Document
+        try {
+            document.remove(0, document.getLength());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
+        // Print the finished message
+        if (document != null) {
+            try {
+                document.insertString(document.getLength(), "CPU: " + CPU + "\n\nNo more processes!", null);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
         }
     }
 

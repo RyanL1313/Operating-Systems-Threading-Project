@@ -174,6 +174,8 @@ public class CPUThread implements Runnable {
                 e.printStackTrace();
              }
         }
+
+        gui.displayCPUFinishMessage(CPU); // No more processes left for the CPU to grab, print its finished message
     }
 }
 
