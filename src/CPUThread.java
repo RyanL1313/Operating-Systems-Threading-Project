@@ -15,7 +15,6 @@ public class CPUThread implements Runnable {
     private Process process; // The current process this CPU is executing
     private PriorityQueue<Process> processQueue; // The shared queue of all processes run by the simulation
     private int runTime; // The elapsed time units this CPU thread has been running
-    private int pollRate; // The amount of milliseconds 1 time unit is
     private int CPU; // CPU ID
     private GUI gui; // The GUI window to display the data
     static private ReentrantLock CPUlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
@@ -27,7 +26,6 @@ public class CPUThread implements Runnable {
      */
     public CPUThread() {
         runTime = 0;
-        pollRate = 0;
         CPU = 0;
     }
 
@@ -41,7 +39,6 @@ public class CPUThread implements Runnable {
         this.GUIlock = GUIlock;
         runTime = 0;
         this.gui = gui;
-        this.pollRate = pollRate;
         this.CPU = CPU;
     }
 
@@ -99,7 +96,6 @@ public class CPUThread implements Runnable {
     {
         return numProcessesCompleted;
     }
-    public void setPollRate(int pollRate) { this.pollRate = pollRate; }
 
     /**
      * Simulates the running of a process.
@@ -122,7 +118,6 @@ public class CPUThread implements Runnable {
                     e.printStackTrace();
                 }
             }
-            pollRate = gui.getPollRateVal();
             int timeRemaining = process.getSerTime(); // Get how long the process will occupy the CPU
 
             boolean paused = false;

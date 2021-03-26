@@ -8,17 +8,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Ryan Lynch, Braden McGee, Sarah Pierson
  */
 class Simulation {
-    //static PriorityQueue<Process> processQueue = new ProcessQueueManager().getProcessQueue();
-
     /**
      * Main driver for the program.
      * @param args Console arguments
      */
     public static void main(String[] args)
     {
-        double throughput = 0;
-        int numProcessesComplete = 0;
-        int timeElapsed = 0;
         int pollRateVal = 0;
         ReentrantLock CPUlock = new ReentrantLock();
         ReentrantLock GUIlock = new ReentrantLock();
