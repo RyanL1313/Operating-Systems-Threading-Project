@@ -93,12 +93,17 @@ public class HRRNCPUThread implements Runnable {
             Collections.sort(readyQueue, new ProcessComparator()); // Sort the processes by response ratio
             Process curProcess = readyQueue.get(0); // Get the process with the highest response ratio
             readyQueue.remove(0); // Remove the process from the ready queue
+            gui.removeProcessFromTable(curProcess.getID()); // Remove this process from the wait table
 
             int timeRemaining = curProcess.getSerTime(); // Get how long the process will occupy the CPU
             boolean paused = false; // Gets set when the user presses the pause button
 
             while (timeRemaining > 0) // Run the process until its remaining service time hits 0
             {
+                // Sort the processes in the wait table by HRRN
+                Collections.sort(readyQueue, new ProcessComparator());
+                gui.sortWaitingTable1ByRespRatio(readyQueue);
+
                 // Display the HRRN CPU stats, including the process id, CPU id, and time remaining for the process to complete
                 gui.updateCPUStats1(curProcess.getID(), CPU, timeRemaining);
 
@@ -135,9 +140,6 @@ public class HRRNCPUThread implements Runnable {
 
             numProcessesCompleted++;
             gui.addToFullTable1(curProcess, HRRNRunTime, numProcessesCompleted); // Add the finished process to the HRRN table of finished processes
-            gui.removeProcessFromTable(curProcess.getID()); // Remove this process from the wait table
-            Collections.sort(readyQueue, new ProcessComparator()); // Sort the processes by response ratio again for correct table entry
-            gui.sortWaitingTable1ByRespRatio(readyQueue); // Sort the processes listed in the HRRN waiting queue table
         }
 
         gui.displayCPUFinishMessage(CPU, "HRRN");
