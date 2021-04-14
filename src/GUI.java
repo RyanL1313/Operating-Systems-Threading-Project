@@ -1003,6 +1003,8 @@ public class GUI extends javax.swing.JFrame {
         StartButton.setEnabled(false);
         PauseButton.setEnabled(true);
 
+        paused = false;
+
         pollRateVal = Integer.parseInt(pollRateInput.getText());
     }//GEN-LAST:event_StartButtonActionPerformed
 
