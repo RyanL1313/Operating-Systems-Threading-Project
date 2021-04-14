@@ -126,7 +126,7 @@ public class CPUThread implements Runnable {
                 while (timeRemaining > 0) {
                     // Update the corresponding CPU window
                     if (CPU == 1) {
-                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                        //gui.updateCPUStats(process.getID(), CPU, timeRemaining);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
@@ -143,8 +143,7 @@ public class CPUThread implements Runnable {
                     } while (paused);
 
                     // Update the corresponding CPU window after execution
-                    if (CPU == 1) {
-                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                    if (CPU == 1) {gui.updateCPUStats1(process.getID(), CPU, timeRemaining);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
@@ -158,7 +157,7 @@ public class CPUThread implements Runnable {
             }
         }
 
-        gui.displayCPUFinishMessage(CPU); // No more processes left for the CPU to grab, print its finished message
+        gui.displayCPUFinishMessage(CPU, "FCFS"); // No more processes left for the CPU to grab, print its finished message
     }
 }
 
