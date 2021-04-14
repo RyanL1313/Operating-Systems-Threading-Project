@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -471,15 +472,14 @@ public class GUI extends javax.swing.JFrame {
      * Sorts the waiting queue table for the HRRN algorithm by the response ratio of the processes.
      * @param readyQueue The queue of ready processes in order by response ratio
      */
-    void sortWaitingTable1ByRespRatio(PriorityQueue<Process> readyQueue)
+    void sortWaitingTable1ByRespRatio(ArrayList<Process> readyQueue)
     {
-        PriorityQueue<Process> rqCopy = new PriorityQueue<>(readyQueue);
         DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
         Process nextProcess = null;
-        int numProcesses = rqCopy.size();
+        int numProcesses = readyQueue.size();
         for (int i = 0; i < numProcesses; i++)
         {
-            nextProcess = rqCopy.poll();
+            nextProcess = readyQueue.get(i);
             model.setValueAt(nextProcess.getID(), i, 0);
             model.setValueAt(nextProcess.getSerTime(), i, 1);
         }

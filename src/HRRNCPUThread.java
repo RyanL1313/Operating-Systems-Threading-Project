@@ -1,6 +1,7 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 /**
  * The HRRNCPUThread classes simulates the execution of processes following the HRRN algorithm.
@@ -14,9 +15,8 @@ public class HRRNCPUThread implements Runnable {
     private int CPU; // ID of this CPU
     private GUI gui; // The GUI window to display the data
     private PriorityQueue<Process> processQueue; // The global queue of all processes to be run
-    private PriorityQueue<Process> readyQueue; // The queue of ready processes
-    private int runTime; // The elapsed time this CPU thread has been running
-    private Process curProcess; // The currently executing process
+    private ArrayList<Process> readyQueue; // The queue of ready processes
+    private static int HRRNRunTime; // The elapsed time this CPU thread has been running
     private int numProcessesCompleted; // The number of processes that have completed
 
     /**
@@ -39,35 +39,9 @@ public class HRRNCPUThread implements Runnable {
     {
         this.gui = gui;
         this.CPU = CPU;
-        this.runTime = 0;
+        this.HRRNRunTime = 0;
         this.processQueue = OrigProcessQueue;
-
-        // Make the queue of ready processes be ordered by their response ratio (wait time + service time) / service time
-        readyQueue = new PriorityQueue<>(new Comparator<Process>() {
-            @Override
-            public int compare(Process p1, Process p2) {
-                // Since HRRN is non-preemptive, the wait time will just be the run time minus the arrival time of the process
-                int p1WaitTime = runTime - p1.getArrTime();
-                int p2WaitTime = runTime - p2.getArrTime();
-
-                double p1RespRatio = ((double)p1WaitTime + p1.getSerTime()) / (double)p1.getSerTime();
-                double p2RespRatio = ((double)p2WaitTime + p2.getSerTime()) / (double)p2.getSerTime();
-
-                // Higher response ratio favored over lower response ratio.
-                if (p1RespRatio > p2RespRatio)
-                {
-                    return -1;
-                }
-                else if (p1RespRatio < p2RespRatio)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        });
+        this.readyQueue = new ArrayList();
     }
 
     /**
@@ -76,7 +50,7 @@ public class HRRNCPUThread implements Runnable {
     private void addProcessesToReadyQueue()
     {
         // Add all processes that arrive at this time to the ready queue
-        while (!processQueue.isEmpty() && processQueue.peek().getArrTime() == runTime) {
+        while (!processQueue.isEmpty() && processQueue.peek().getArrTime() == HRRNRunTime) {
             Process arrivingProcess = processQueue.poll();
             readyQueue.add(arrivingProcess);
 
@@ -84,22 +58,41 @@ public class HRRNCPUThread implements Runnable {
         }
     }
 
+    /**
+     * Getter for the run time of the simulation for the HRRN algorithm.
+     * @return The HRRN run time
+     */
+    public static int getHRRNRunTime()
+    {
+        return HRRNRunTime;
+    }
+
+    /**
+     * The run method to run this CPU object's thread.
+     * Executes until both the original queue of processes is empty and the ready queue is empty.
+     * Performs the HRRN scheduling algorithm.
+     *
+     * There are times when the ready queue can be empty but there are still processes yet to arrive from
+     * the original process queue. That situation is handled immediately after the first loop starts.
+     */
     @Override
     public void run() {
         while (!processQueue.isEmpty() || !readyQueue.isEmpty()) // CPU runs until the global process queue and ready queues are empty
         {
             while (readyQueue.isEmpty()) // Stay in this loop until a process arrives and is placed in the ready queue
             {
-                if (processQueue.peek().getArrTime() == runTime) // If it's time for the next process to arrive
+                if (processQueue.peek().getArrTime() == HRRNRunTime) // If it's time for the next process to arrive
                 {
                     addProcessesToReadyQueue(); // Add this process and any additional arriving processes to the ready queue
                 }
                 else
-                    runTime++; // No ready processes, just increment the run time and test again for the new run time
+                    HRRNRunTime++; // No ready processes, just increment the run time and test again for the new run time
             }
 
             // Time to run the process in the ready queue with the highest response ratio
-            Process curProcess = readyQueue.poll();
+            Collections.sort(readyQueue, new ProcessComparator()); // Sort the processes by response ratio
+            Process curProcess = readyQueue.get(0); // Get the process with the highest response ratio
+            readyQueue.remove(0); // Remove the process from the ready queue
 
             int timeRemaining = curProcess.getSerTime(); // Get how long the process will occupy the CPU
             boolean paused = false; // Gets set when the user presses the pause button
@@ -107,7 +100,7 @@ public class HRRNCPUThread implements Runnable {
             while (timeRemaining > 0) // Run the process until its remaining service time hits 0
             {
                 // Display the HRRN CPU stats, including the process id, CPU id, and time remaining for the process to complete
-                gui.updateCPUStats1(curProcess.getID(), 1, timeRemaining);
+                gui.updateCPUStats1(curProcess.getID(), CPU, timeRemaining);
 
                 try {
                     Thread.sleep((long) (gui.getPollRateVal())); // Sleeps for the poll rate in ms
@@ -117,10 +110,10 @@ public class HRRNCPUThread implements Runnable {
 
                 // 1 time unit has just passed, update the counters
                 timeRemaining--;
-                runTime++;
+                HRRNRunTime++;
 
                 // Add potential arriving processes to the ready queue
-                if (!processQueue.isEmpty() && processQueue.peek().getArrTime() == runTime)
+                if (!processQueue.isEmpty() && processQueue.peek().getArrTime() == HRRNRunTime)
                 {
                     addProcessesToReadyQueue();
                 }
@@ -138,20 +131,48 @@ public class HRRNCPUThread implements Runnable {
                         }
                     }
                 } while (paused); // Stay in this do-while loop until the user resumes the simulation
-
-
             }
 
             numProcessesCompleted++;
-            gui.addToFullTable1(curProcess, runTime, numProcessesCompleted); // Add the finished process to the HRRN table of finished processes
+            gui.addToFullTable1(curProcess, HRRNRunTime, numProcessesCompleted); // Add the finished process to the HRRN table of finished processes
             gui.removeProcessFromTable(curProcess.getID()); // Remove this process from the wait table
+            Collections.sort(readyQueue, new ProcessComparator()); // Sort the processes by response ratio again for correct table entry
             gui.sortWaitingTable1ByRespRatio(readyQueue); // Sort the processes listed in the HRRN waiting queue table
-
-            curProcess = null;
         }
 
-        gui.displayCPUFinishMessage(1, "HRRN");
+        gui.displayCPUFinishMessage(CPU, "HRRN");
 
+    }
+}
+
+/**
+ * Comparator object to compare processes by their response ratios.
+ */
+class ProcessComparator implements Comparator<Process>
+{
+
+    /**
+     * Compare by response ratios. Higher response ratio should place the process in front of the other
+     * @param p1 Process 1
+     * @param p2 Process 2
+     * @return The comparison result
+     */
+    @Override
+    public int compare(Process p1, Process p2) {
+        int runTime = HRRNCPUThread.getHRRNRunTime();
+        int p1WaitTime = runTime - p1.getArrTime();
+        int p2WaitTime = runTime - p2.getArrTime();
+
+        double p1RespRatio = ((double)p1WaitTime + p1.getSerTime()) / (double)p1.getSerTime();
+        double p2RespRatio = ((double)p2WaitTime + p2.getSerTime()) / (double)p2.getSerTime();
+
+        // Higher response ratio favored over lower response ratio
+        if (p1RespRatio > p2RespRatio)
+            return -1;
+        else if (p1RespRatio < p2RespRatio)
+            return 1;
+        else
+            return 0;
     }
 }
 

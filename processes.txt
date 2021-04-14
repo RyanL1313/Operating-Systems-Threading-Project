@@ -2,4 +2,4 @@
 2, Process B, 6, 1
 4, Process C, 4, 1
 6, Process D, 5, 1
-8, Process E, 8, 2
+8, Process E, 2, 2
