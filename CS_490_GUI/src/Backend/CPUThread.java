@@ -17,7 +17,6 @@ public class CPUThread implements Runnable {
     private Process process; // The current process this CPU is executing
     private PriorityQueue<Process> processQueue; // The shared queue of all processes run by the simulation
     private int runTime; // The elapsed time units this CPU thread has been running
-    private int pollRate; // The amount of milliseconds 1 time unit is
     private int CPU; // CPU ID
     private GUI gui; // The GUI window to display the data
     static private ReentrantLock CPUlock; // Lock to allow for mutual exclusion when grabbing processes from the queue (static so it can be shared among all CPUs)
@@ -29,7 +28,6 @@ public class CPUThread implements Runnable {
      */
     public CPUThread() {
         runTime = 0;
-        pollRate = 0;
         CPU = 0;
     }
 
@@ -43,7 +41,6 @@ public class CPUThread implements Runnable {
         this.GUIlock = GUIlock;
         runTime = 0;
         this.gui = gui;
-        this.pollRate = pollRate;
         this.CPU = CPU;
     }
 
@@ -74,8 +71,8 @@ public class CPUThread implements Runnable {
     }
 
     /**
-    * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI and the throughput
-    */
+     * Updates the completed processes for the static variable numProcessesCompleted, also updates the bottom table of the GUI and the throughput
+     */
     synchronized private void updateCompletedProcesses() {
         GUIlock.lock();
         try {
@@ -101,7 +98,6 @@ public class CPUThread implements Runnable {
     {
         return numProcessesCompleted;
     }
-    public void setPollRate(int pollRate) { this.pollRate = pollRate; }
 
     /**
      * Simulates the running of a process.
@@ -124,7 +120,6 @@ public class CPUThread implements Runnable {
                     e.printStackTrace();
                 }
             }
-            pollRate = gui.getPollRateVal();
             int timeRemaining = process.getSerTime(); // Get how long the process will occupy the CPU
 
             boolean paused = false;
@@ -133,7 +128,7 @@ public class CPUThread implements Runnable {
                 while (timeRemaining > 0) {
                     // Update the corresponding CPU window
                     if (CPU == 1) {
-                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                        //gui.updateCPUStats(process.getID(), CPU, timeRemaining);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
@@ -150,22 +145,21 @@ public class CPUThread implements Runnable {
                     } while (paused);
 
                     // Update the corresponding CPU window after execution
-                    if (CPU == 1) {
-                        gui.updateCPUStats(process.getID(), CPU, timeRemaining);
+                    if (CPU == 1) {gui.updateCPUStats1(process.getID(), CPU, timeRemaining);
                     }
                     else if (CPU == 2)
                         gui.updateCPUStats2(process.getID(), CPU, timeRemaining);
                 }
 
-                gui.removeProcessFromTable(process.getID()); // Process done, updating GUI
+                gui.removeProcessFromTable1(process.getID()); // Process done, updating GUI
                 updateCompletedProcesses();
                 process = null;
             } catch (InterruptedException e) {
                 e.printStackTrace();
-             }
+            }
         }
 
-        gui.displayCPUFinishMessage(CPU); // No more processes left for the CPU to grab, print its finished message
+        gui.displayCPUFinishMessage(CPU, "FCFS"); // No more processes left for the CPU to grab, print its finished message
     }
 }
 

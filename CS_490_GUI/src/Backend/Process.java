@@ -10,6 +10,7 @@ public class Process {
     private int arrTime;
     private String ID;
     private int serTime;
+    private int RRTime;
     private int priority;
     private static final int NUMATTRIBUTES = 4;
 
@@ -33,21 +34,12 @@ public class Process {
         ID = processAttributes[1];
         serTime = Integer.parseInt(processAttributes[2]);
         priority = Integer.parseInt(processAttributes[3]);
+        RRTime = serTime;
     }
-    
-    public void setID(String input)
+
+    public void setRRTime(int input)
     {
-        ID = input;
-    }
-    
-    public void setArrTime(int input)
-    {
-        arrTime = input;
-    }
-    
-    public void setSerTime(int input)
-    {
-        serTime = input;
+        RRTime = input;
     }
 
     public int getArrTime()
@@ -65,9 +57,9 @@ public class Process {
         return serTime;
     }
 
-    public int getPriority()
+    public int getRRTime()
     {
-        return priority;
+        return RRTime;
     }
 
     /**

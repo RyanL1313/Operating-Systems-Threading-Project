@@ -1,3 +1,5 @@
+package Backend;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +20,7 @@ public class HRRNCPUThread implements Runnable {
     private ArrayList<Process> readyQueue; // The queue of ready processes
     private static int HRRNRunTime; // The elapsed time this CPU thread has been running
     private int numProcessesCompleted; // The number of processes that have completed
+    private int sliceLen; // RR Slice Length
 
     /**
      * Default constructor.
@@ -93,7 +96,7 @@ public class HRRNCPUThread implements Runnable {
             Collections.sort(readyQueue, new ProcessComparator()); // Sort the processes by response ratio
             Process curProcess = readyQueue.get(0); // Get the process with the highest response ratio
             readyQueue.remove(0); // Remove the process from the ready queue
-            gui.removeProcessFromTable(curProcess.getID()); // Remove this process from the wait table
+            gui.removeProcessFromTable1(curProcess.getID()); // Remove this process from the wait table
 
             int timeRemaining = curProcess.getSerTime(); // Get how long the process will occupy the CPU
             boolean paused = false; // Gets set when the user presses the pause button

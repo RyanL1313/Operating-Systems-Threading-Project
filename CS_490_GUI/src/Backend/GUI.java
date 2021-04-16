@@ -1,10 +1,10 @@
-/*
+package Backend;/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Backend;
 
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,7 +17,7 @@ import javax.swing.text.StyledDocument;
  *
  * @author Sarah Pierson
  */
-public class GUI extends javax.swing.JFrame {
+public class GUI extends JFrame {
     PriorityQueue<Process> pqc_temp;
     int CPU;
     String execStatus;
@@ -25,12 +25,14 @@ public class GUI extends javax.swing.JFrame {
     boolean alreadyStarted = false;
     boolean paused = false;
     int pollRateVal = 0;
+    int RRSliceLen = 3;
 
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
+        initAllTables();
         StatusPane1.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
         StatusPane2.setText("CPU: " + CPU + "\nexec: " + execStatus + "\ntime remaining: " + timeRemaining);
     }
@@ -44,45 +46,34 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        StartButton = new javax.swing.JButton();
-        PauseButton = new javax.swing.JButton();
-        SystemStatus = new javax.swing.JLabel();
-        pollRateInput = new javax.swing.JTextField("1000");
-        jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        Table1 = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        StatusPane1 = new javax.swing.JTextPane();
-        jLabel4 = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        Table2 = new javax.swing.JTable();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        StatusPane2 = new javax.swing.JTextPane();
-        jLabel5 = new javax.swing.JLabel();
-        currentThroughputInput = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
+        pollRateInput = new JTextField("1000");
+        jLabel3 = new JLabel();
+        jLabel2 = new JLabel();
+        jScrollPane1 = new JScrollPane();
+        waitingTable1 = new JTable();
+        jScrollPane2 = new JScrollPane();
+        StatusPane1 = new JTextPane();
+        jLabel4 = new JLabel();
+        jScrollPane4 = new JScrollPane();
+        fullTable1 = new JTable();
+        jScrollPane5 = new JScrollPane();
+        StatusPane2 = new JTextPane();
+        jLabel5 = new JLabel();
+        currentnTat1 = new JTextField();
+        jScrollPane3 = new JScrollPane();
+        waitingTable2 = new JTable();
+        jScrollPane6 = new JScrollPane();
+        fullTable2 = new JTable();
+        currentnTat2 = new JTextField();
+        jLabel6 = new JLabel();
+        StartButton = new JButton();
+        PauseButton = new JButton();
+        roundRobinTimeSlice = new JTextField("3");
+        jLabel7 = new JLabel();
+        systemStatus = new JLabel();
+        jLabel8 = new JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        StartButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        StartButton.setText("Start System");
-        StartButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                StartButtonActionPerformed(evt);
-            }
-        });
-
-        PauseButton.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        PauseButton.setText("Pause System");
-        PauseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PauseButtonActionPerformed(evt);
-            }
-        });
-
-        SystemStatus.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        SystemStatus.setText("System Status");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         pollRateInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -95,25 +86,19 @@ public class GUI extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Waiting Process Queue");
 
-        Table1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Process Name", "Service Time"
-            }
+        waitingTable1.setModel(new DefaultTableModel(
+                new Object [][] {
+
+                },
+                new String [] {
+                        "Process Name", "Service Time"
+                }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                    String.class, String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                    false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -124,134 +109,253 @@ public class GUI extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        Table1.setRowHeight(30);
-        Table1.getTableHeader().setReorderingAllowed(false);
-        Table1.addAncestorListener(new javax.swing.event.AncestorListener() {
+        waitingTable1.setRowHeight(30);
+        waitingTable1.getTableHeader().setReorderingAllowed(false);
+        waitingTable1.addAncestorListener(new javax.swing.event.AncestorListener() {
             public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
-                Table1AncestorAdded(evt);
+                waitingTable1AncestorAdded(evt);
             }
             public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
             }
             public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
             }
         });
-        jScrollPane1.setViewportView(Table1);
+        jScrollPane1.setViewportView(waitingTable1);
 
         StatusPane1.setEditable(false);
         jScrollPane2.setViewportView(StatusPane1);
 
         jLabel4.setText("ms");
 
-        Table2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"", null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"
-            }
+        fullTable1.setModel(new DefaultTableModel(
+                new Object [][] {
+
+                },
+                new String [] {
+                        "Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"
+                }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                    false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane4.setViewportView(Table2);
+        jScrollPane4.setViewportView(fullTable1);
 
         StatusPane2.setEditable(false);
         jScrollPane5.setViewportView(StatusPane2);
 
-        jLabel5.setText("Current Throughput:");
+        jLabel5.setText("Current average nTAT:");
 
-        currentThroughputInput.addActionListener(new java.awt.event.ActionListener() {
+        currentnTat1.setEditable(false);
+        currentnTat1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                currentThroughputInputActionPerformed(evt);
+                currentnTat1ActionPerformed(evt);
             }
         });
 
-        jLabel6.setText("processes/unit of time");
+        waitingTable2.setModel(new DefaultTableModel(
+                new Object [][] {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+                },
+                new String [] {
+                        "Process Name", "Service Time"
+                }
+        ) {
+            Class[] types = new Class [] {
+                    String.class, String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                    false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        waitingTable2.setRowHeight(30);
+        waitingTable2.getTableHeader().setReorderingAllowed(false);
+        waitingTable2.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                waitingTable2AncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
+        jScrollPane3.setViewportView(waitingTable2);
+
+        fullTable2.setModel(new DefaultTableModel(
+                new Object [][] {
+
+                },
+                new String [] {
+                        "Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"
+                }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane6.setViewportView(fullTable2);
+
+        currentnTat2.setEditable(false);
+        currentnTat2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                currentnTat2ActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Current average nTAT:");
+
+        StartButton.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        StartButton.setText("Start System");
+        StartButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                StartButtonActionPerformed(evt);
+            }
+        });
+
+        PauseButton.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        PauseButton.setText("Pause System");
+        PauseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PauseButtonActionPerformed(evt);
+            }
+        });
+
+        roundRobinTimeSlice.setEditable(true);
+        roundRobinTimeSlice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                roundRobinTimeSliceActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("Round robin time slice:");
+
+        systemStatus.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        systemStatus.setText("System Status");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel8.setText("Waiting Process Queue");
+
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(currentThroughputInput, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel6)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(10, 10, 10)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(10, 10, 10)
-                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(PauseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(SystemStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(43, 43, 43))))
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jScrollPane4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jLabel5)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(currentnTat1, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(39, 39, 39)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jLabel6)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(currentnTat2, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(0, 0, Short.MAX_VALUE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jScrollPane6, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                                                                .addContainerGap())))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+                                                                                .addGap(18, 18, 18)
+                                                                                .addComponent(jScrollPane2, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE))
+                                                                        .addComponent(jLabel2))
+                                                                .addGap(118, 118, 118)
+                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                                                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                                .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+                                                                                .addGap(18, 18, 18)
+                                                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                                                        .addComponent(jScrollPane5, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)
+                                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                                .addComponent(jLabel7, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+                                                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                                                .addComponent(roundRobinTimeSlice))
+                                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                                .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
+                                                                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                                                .addComponent(pollRateInput, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                                                                                .addGap(10, 10, 10)
+                                                                                                .addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))))
+                                                                        .addComponent(jLabel8, GroupLayout.Alignment.LEADING)))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(StartButton, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(PauseButton, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(84, 84, 84)
+                                                                .addComponent(systemStatus, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)))
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(PauseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SystemStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(pollRateInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(currentThroughputInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addContainerGap())
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(StartButton, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(PauseButton, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(systemStatus))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(jLabel8)
+                                        .addComponent(jLabel2))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jScrollPane2, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPane5, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+                                                .addGap(36, 36, 36)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(3, 3, 3)
+                                                                .addComponent(jLabel4))
+                                                        .addComponent(pollRateInput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(3, 3, 3)
+                                                                .addComponent(jLabel3)))
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel7)
+                                                        .addComponent(roundRobinTimeSlice, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(40, 40, 40)))
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane4, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane6, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel5)
+                                        .addComponent(currentnTat1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel6)
+                                        .addComponent(currentnTat2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
 
         pack();
@@ -267,10 +371,585 @@ public class GUI extends javax.swing.JFrame {
         pqc_temp = new PriorityQueue<>(input);
     }
 
+    void initAllTables()
+    {
+        DefaultTableModel table1 = (DefaultTableModel) waitingTable1.getModel();
+        DefaultTableModel table2 = (DefaultTableModel) waitingTable2.getModel();
+
+        DefaultTableModel table3 = (DefaultTableModel) fullTable1.getModel();
+        DefaultTableModel table4 = (DefaultTableModel) fullTable2.getModel();
+
+        for (int i = 0; i < 7; i++)
+        {
+            Object[] temp = new Object[]
+                    {
+                            "",
+                            ""
+                    };
+            table1.addRow(temp);
+            table2.addRow(temp);
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            Object[] temp = new Object[]
+                    {
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            ""
+                    };
+            table3.addRow(temp);
+            table4.addRow(temp);
+        }
+    }
+
+    //=======================================================================
+    //NEW:
+
+    public void setRoundRobinSlice(float input)
+    {
+        roundRobinTimeSlice.setText(String.valueOf(input));
+    }
+
+    public void setCurrentAverageNtat1(float input)
+    {
+        currentnTat1.setText(String.valueOf(input));
+    }
+
+    public void setCurrentAverageNtat2(float input)
+    {
+        currentnTat2.setText(String.valueOf(input));
+    }
+
+
+    //=======================================================================
+    //NEW, for the skinner tables:
+    void addToWaitingTable1(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(""))
+            {
+                model.setValueAt(processInput.getID(), i, 0);
+                model.setValueAt(processInput.getSerTime(), i, 1);
+                return; // Added the process. Exit the function
+            }
+        }
+
+        // If this point is reached, the table is full, and a new row with the process data will get added
+        Object[] rowInput = {processInput.getID(), processInput.getSerTime()};
+        model.addRow(rowInput);
+    }
+
+    void addToWaitingTable2(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(""))
+            {
+                model.setValueAt(processInput.getID(), i, 0);
+                model.setValueAt(processInput.getSerTime(), i, 1);
+                return; // Added the process. Exit the function
+            }
+        }
+
+        // If this point is reached, the table is full, and a new row with the process data will get added
+        Object[] rowInput = {processInput.getID(), processInput.getSerTime()};
+        model.addRow(rowInput);
+    }
+
+    /**
+     * Sorts the waiting queue table for the HRRN algorithm by the response ratio of the processes.
+     * @param readyQueue The queue of ready processes in order by response ratio
+     */
+    void sortWaitingTable1ByRespRatio(ArrayList<Process> readyQueue)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        Process nextProcess = null;
+        int numProcesses = readyQueue.size();
+        for (int i = 0; i < numProcesses; i++)
+        {
+            nextProcess = readyQueue.get(i);
+            model.setValueAt(nextProcess.getID(), i, 0);
+            model.setValueAt(nextProcess.getSerTime(), i, 1);
+        }
+    }
+
+    void updateServiceTimeOnWaitingTable1(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                model.setValueAt(processInput.getSerTime(), i, 1);
+                break;
+            }
+        }
+    }
+
+    void updateServiceTimeOnWaitingTable2(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                model.setValueAt(processInput.getSerTime(), i, 1);
+                break;
+            }
+        }
+    }
+
+    void updateRowWaitingTable1(int row, Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        model.setValueAt(processInput.getID(), row, 0);
+        model.setValueAt(processInput.getSerTime(), row, 1);
+    }
+
+    void updateRowWaitingTable2(int row, Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+        model.setValueAt(processInput.getID(), row, 0);
+        model.setValueAt(processInput.getSerTime(), row, 1);
+    }
+
+    int getIndexFromWaitingTable1(Process processInput)
+    {
+        int index = -1;
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    int getIndexFromWaitingTable2(Process processInput)
+    {
+        int index = -1;
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    void removeRowFromWaitingTable1(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        int index = getIndexFromWaitingTable1(processInput);
+        if (index != -1)
+        {
+            if (model.getRowCount() > 6)
+            {
+                model.removeRow(index);
+            }
+            else
+            {
+                model.removeRow(index);
+                Object[] temp = new Object[]
+                        {
+                                "",
+                                ""
+                        };
+                model.addRow(temp);
+            }
+        }
+    }
+
+    void removeRowFromWaitingTable2(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+        int index = getIndexFromWaitingTable2(processInput);
+        if (index != -1)
+        {
+            if (model.getRowCount() > 6)
+            {
+                model.removeRow(index);
+            }
+            else
+            {
+                model.removeRow(index);
+                Object[] temp = new Object[]
+                        {
+                                "",
+                                ""
+                        };
+                model.addRow(temp);
+            }
+        }
+    }
+
+    void clearWaitingTable1()
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable1.getModel();
+        Object[] temp = new Object[]
+                {
+                        "",
+                        ""
+                };
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            model.removeRow(i);
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            model.addRow(temp);
+        }
+    }
+
+    void clearWaitingTable2()
+    {
+        DefaultTableModel model = (DefaultTableModel) waitingTable2.getModel();
+        Object[] temp = new Object[]
+                {
+                        "",
+                        ""
+                };
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            model.removeRow(i);
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            model.addRow(temp);
+        }
+    }
+
+    //=======================================================================
+    //NEW, for the wider tables:
+    void addToFullTable1(Process processInput, int finishTime, int numProcessesCompleted)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        int arrivalTime = processInput.getArrTime();
+        int serviceTime = processInput.getSerTime();
+        int TAT = finishTime - arrivalTime;
+        float nTAT = (float)TAT / (float)serviceTime;
+        float avgNTAT = 0; // The average nTAT for the HRRN algorithm
+
+        if (numProcessesCompleted > 1) // Can retrieve a value from the average nTAT text box
+        {
+            float curAvgNTAT = Float.parseFloat(currentnTat1.getText());
+            avgNTAT = curAvgNTAT * (numProcessesCompleted - 1); // Previous sum of all nTATs
+            avgNTAT += nTAT; // Add this process's nTAT to the sum
+            avgNTAT /= numProcessesCompleted; // Get the new average nTAT
+        }
+        else
+            avgNTAT = nTAT; // First process to complete, average is just this process's nTAT
+
+
+        String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+        String sAvgNTAT = String.format("%.3f", avgNTAT); // The avgerage nTAT to three decimal places
+
+        currentnTat1.setText(sAvgNTAT);
+
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(""))
+            {
+                model.setValueAt(processInput.getID(), i, 0);
+                model.setValueAt(processInput.getArrTime(), i, 1);
+                model.setValueAt(processInput.getSerTime(), i, 2);
+                model.setValueAt(finishTime, i, 3);
+                model.setValueAt(TAT, i, 4);
+                model.setValueAt(sNTAT, i, 5);
+                return; // Added the process. Exit the function
+            }
+        }
+
+        // If this point is reached, the rows are full; add a new one with the process data
+        Object[] rowInput =
+                {
+                        processInput.getID(),
+                        processInput.getArrTime(),
+                        processInput.getSerTime(),
+                        finishTime,
+                        TAT,
+                        sNTAT
+                };
+        model.addRow(rowInput);
+    }
+
+    void addToFullTable2(Process processInput, int finishTime, int numProcessesCompleted)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        int arrivalTime = processInput.getArrTime();
+        int serviceTime = processInput.getSerTime();
+        int TAT = finishTime - arrivalTime;
+        float nTAT = (float)TAT / (float)serviceTime;
+        float avgNTAT = 0;
+
+        if (numProcessesCompleted > 1) // Can retrieve a value from the average nTAT text box
+        {
+            float curAvgNTAT = Float.parseFloat(currentnTat2.getText());
+            avgNTAT = curAvgNTAT * (numProcessesCompleted - 1); // Previous sum of all nTATs
+            avgNTAT += nTAT; // Add this process's nTAT to the sum
+            avgNTAT /= numProcessesCompleted; // Get the new average nTAT
+        }
+        else
+            avgNTAT = nTAT; // First process to complete, average is just this process's nTAT
+
+
+        String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+        String sAvgNTAT = String.format("%.3f", avgNTAT); // The avgerage nTAT to three decimal places
+
+        currentnTat2.setText(sAvgNTAT);
+
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(""))
+            {
+                model.setValueAt(processInput.getID(), i, 0);
+                model.setValueAt(processInput.getArrTime(), i, 1);
+                model.setValueAt(processInput.getSerTime(), i, 2);
+                model.setValueAt(finishTime, i, 3);
+                model.setValueAt(TAT, i, 4);
+                model.setValueAt(sNTAT, i, 5);
+                return; // Added the process. Exit the function
+            }
+        }
+
+        // If this point is reached, the rows are full; add a new one with the process data
+        Object[] rowInput =
+                {
+                        processInput.getID(),
+                        processInput.getArrTime(),
+                        processInput.getSerTime(),
+                        finishTime,
+                        TAT,
+                        sNTAT
+                };
+        model.addRow(rowInput);
+    }
+
+    void updateRowFullTable1_byProcess(Process processInput, int finishTime)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        int index = getIndexFromFullTable1(processInput);
+        if (index != -1)
+        {
+            int arrivalTime = processInput.getArrTime();
+            int serviceTime = processInput.getSerTime();
+            int TAT = finishTime - arrivalTime;
+            float nTAT = (float)TAT / (float)serviceTime;
+            String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+            model.setValueAt(processInput.getID(), index, 0);
+            model.setValueAt(processInput.getArrTime(), index, 1);
+            model.setValueAt(processInput.getSerTime(), index, 2);
+            model.setValueAt(finishTime, index, 3);
+            model.setValueAt(TAT, index, 4);
+            model.setValueAt(sNTAT, index, 5);
+        }
+
+    }
+
+    void updateRowFullTable1_byRow(int row, Process processInput, int finishTime)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        int arrivalTime = processInput.getArrTime();
+        int serviceTime = processInput.getSerTime();
+        int TAT = finishTime - arrivalTime;
+        float nTAT = (float)TAT / (float)serviceTime;
+        String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+        model.setValueAt(processInput.getID(), row, 0);
+        model.setValueAt(processInput.getArrTime(), row, 1);
+        model.setValueAt(processInput.getSerTime(), row, 2);
+        model.setValueAt(finishTime, row, 3);
+        model.setValueAt(TAT, row, 4);
+        model.setValueAt(sNTAT, row, 5);
+    }
+
+    void updateRowFullTable2_byProcess(Process processInput, int finishTime)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        int index = getIndexFromFullTable2(processInput);
+        if (index != -1)
+        {
+            int arrivalTime = processInput.getArrTime();
+            int serviceTime = processInput.getSerTime();
+            int TAT = finishTime - arrivalTime;
+            float nTAT = (float)TAT / (float)serviceTime;
+            String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+            model.setValueAt(processInput.getID(), index, 0);
+            model.setValueAt(processInput.getArrTime(), index, 1);
+            model.setValueAt(processInput.getSerTime(), index, 2);
+            model.setValueAt(finishTime, index, 3);
+            model.setValueAt(TAT, index, 4);
+            model.setValueAt(sNTAT, index, 5);
+        }
+
+    }
+
+    void updateRowFullTable2_byRow(int row, Process processInput, int finishTime)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        int arrivalTime = processInput.getArrTime();
+        int serviceTime = processInput.getSerTime();
+        int TAT = finishTime - arrivalTime;
+        float nTAT = (float)TAT / (float)serviceTime;
+        String sNTAT = String.format("%.3f", nTAT); // The nTAT to three decimal places
+        model.setValueAt(processInput.getID(), row, 0);
+        model.setValueAt(processInput.getArrTime(), row, 1);
+        model.setValueAt(processInput.getSerTime(), row, 2);
+        model.setValueAt(finishTime, row, 3);
+        model.setValueAt(TAT, row, 4);
+        model.setValueAt(sNTAT, row, 5);
+    }
+
+
+    int getIndexFromFullTable1(Process processInput)
+    {
+        int index = -1;
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    int getIndexFromFullTable2(Process processInput)
+    {
+        int index = -1;
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            if (model.getValueAt(i, 0).equals(processInput.getID()))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    void removeRowFromFullTable1(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        int index = getIndexFromWaitingTable1(processInput);
+        if (index != -1)
+        {
+            if (model.getRowCount() > 5)
+            {
+                model.removeRow(index);
+            }
+            else
+            {
+                model.removeRow(index);
+                Object[] temp = new Object[]
+                        {
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                ""
+                        };
+                model.addRow(temp);
+            }
+        }
+    }
+
+    void removeRowFromFullTable2(Process processInput)
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        int index = getIndexFromWaitingTable2(processInput);
+        if (index != -1)
+        {
+            if (model.getRowCount() > 5)
+            {
+                model.removeRow(index);
+            }
+            else
+            {
+                model.removeRow(index);
+                Object[] temp = new Object[]
+                        {
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                ""
+                        };
+                model.addRow(temp);
+            }
+        }
+    }
+
+    void clearFullTable1()
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
+        Object[] temp = new Object[]
+                {
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
+                };
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            model.removeRow(i);
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            model.addRow(temp);
+        }
+    }
+
+    void clearFullTable2()
+    {
+        DefaultTableModel model = (DefaultTableModel) fullTable2.getModel();
+        Object[] temp = new Object[]
+                {
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
+                };
+        for (int i = 0; i < model.getRowCount(); i++)
+        {
+            model.removeRow(i);
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            model.addRow(temp);
+        }
+    }
+
+
+    //=================================================
+    //OLD:
     void updateRowTable2(int row, Process processInput, int finishTime)
     {
 
-        DefaultTableModel model = (DefaultTableModel) Table2.getModel();
+        DefaultTableModel model = (DefaultTableModel) fullTable1.getModel();
         String processID = processInput.getID();
         int arrivalTime = processInput.getArrTime();
         int serviceTime = processInput.getSerTime();
@@ -294,72 +973,57 @@ public class GUI extends javax.swing.JFrame {
         }
 
     }
-    
-    private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
+    //=================================================
+
+    private void waitingTable1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_waitingTable1AncestorAdded
         // TODO add your handling code here:
-        SystemStatus.setText("System Running");
-
-        StartButton.setEnabled(false);
-        PauseButton.setEnabled(true);
-
-        pollRateVal = Integer.parseInt(pollRateInput.getText());
-
-        if (alreadyStarted == false)
-        {
-            DefaultTableModel model = (DefaultTableModel) Table1.getModel();
-
-            int pqc_temp_size = pqc_temp.size();
-
-            for (int i = 0; i < pqc_temp_size; i++)
-            {
-                Process nextProcess = pqc_temp.poll();
-                String processID = nextProcess.getID();
-                String serviceTime = "" + nextProcess.getSerTime();
-
-                if (i < 7) // Initially, the table has 7 rows
-                {
-                    model.setValueAt(processID, i, 0);
-                    model.setValueAt(serviceTime, i, 1);
-                }
-                else
-                {
-                    Object[] rowInput = {processID, serviceTime};
-                    model.addRow(rowInput);
-                }
-
-            }
-            alreadyStarted = true;
-        }
-        else
-        {
-            paused = false;
-        }
-       
-        
-    }//GEN-LAST:event_StartButtonActionPerformed
-
-    private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
-        // TODO add your handling code here:
-        SystemStatus.setText("System Paused");
-        paused = true;
-        PauseButton.setEnabled(false);
-        StartButton.setEnabled(true);
-    }//GEN-LAST:event_PauseButtonActionPerformed
-
-    private void Table1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_Table1AncestorAdded
-        // TODO add your handling code here:
-    }//GEN-LAST:event_Table1AncestorAdded
+    }//GEN-LAST:event_waitingTable1AncestorAdded
 
     private void pollRateInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pollRateInputActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pollRateInputActionPerformed
 
-    private void currentThroughputInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentThroughputInputActionPerformed
+    private void currentnTat1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentnTat1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_currentThroughputInputActionPerformed
+    }//GEN-LAST:event_currentnTat1ActionPerformed
+
+    private void waitingTable2AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_waitingTable2AncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_waitingTable2AncestorAdded
+
+    private void currentnTat2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentnTat2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_currentnTat2ActionPerformed
+
+    private void roundRobinTimeSliceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roundRobinTimeSliceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_roundRobinTimeSliceActionPerformed
+
+    private void PauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PauseButtonActionPerformed
+        systemStatus.setText("System Paused");
+        paused = true;
+        PauseButton.setEnabled(false);
+        StartButton.setEnabled(true);
+    }//GEN-LAST:event_PauseButtonActionPerformed
+
+    private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
+        systemStatus.setText("System Running");
+
+        StartButton.setEnabled(false);
+        PauseButton.setEnabled(true);
+
+        paused = false;
+
+        pollRateVal = Integer.parseInt(pollRateInput.getText());
+        RRSliceLen = Integer.parseInt(roundRobinTimeSlice.getText());
+    }//GEN-LAST:event_StartButtonActionPerformed
 
     public int getPollRateVal() {
         return pollRateVal;
+    }
+
+    public int getRRSliceLen() {
+        return RRSliceLen;
     }
 
     public boolean getPauseState(){
@@ -367,17 +1031,34 @@ public class GUI extends javax.swing.JFrame {
     }
 
     /**
-     * Removes a process from the wait queue table by searching for a process ID and removing the associated row.
+     * Removes a process from the first process table by searching for a process ID and removing the associated row.
      * @param processID The ID of the process
      */
-    public void removeProcessFromTable(String processID)
+    public void removeProcessFromTable1(String processID)
     {
-        int numRows = Table1.getRowCount();
+        int numRows = waitingTable1.getRowCount();
 
         for(int i = 0; i < numRows; i++) {
-            if (Table1.getValueAt(i,0).toString().equals(processID)) {
+            if (waitingTable1.getValueAt(i,0).toString().equals(processID)) {
                 // Removes row from table and breaks
-                ((DefaultTableModel)Table1.getModel()).removeRow(i);
+                ((DefaultTableModel)waitingTable1.getModel()).removeRow(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Removes a process from the first process table by searching for a process ID and removing the associated row.
+     * @param processID The ID of the process
+     */
+    public void removeProcessFromTable2(String processID)
+    {
+        int numRows = waitingTable2.getRowCount();
+
+        for(int i = 0; i < numRows; i++) {
+            if (waitingTable2.getValueAt(i,0).toString().equals(processID)) {
+                // Removes row from table and breaks
+                ((DefaultTableModel)waitingTable2.getModel()).removeRow(i);
                 break;
             }
         }
@@ -389,7 +1070,7 @@ public class GUI extends javax.swing.JFrame {
      */
     public void setCurrentThroughput(float input)
     {
-        currentThroughputInput.setText(String.format("%.3f", input));
+        currentnTat1.setText(String.format("%.3f", input));
     }
 
     /**
@@ -398,7 +1079,8 @@ public class GUI extends javax.swing.JFrame {
      * @param CPU The CPU number
      * @param timeRemaining The number of time units left for this process to finish
      */
-    public void updateCPUStats(String processID, int CPU, int timeRemaining)
+
+    public void updateCPUStats1(String processID, int CPU, int timeRemaining)
     {
         StyledDocument document = (StyledDocument) StatusPane1.getDocument();
         // Cleaning Document
@@ -409,11 +1091,14 @@ public class GUI extends javax.swing.JFrame {
         }
         // Updating new information
         try {
-            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
+            document.insertString(document.getLength(), "CPU: " + CPU + " (HRRN)\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
+
+
+
 
     /**
      * Updates the displayed stats for the second CPU.
@@ -432,7 +1117,7 @@ public class GUI extends javax.swing.JFrame {
         }
         // Updating new information
         try {
-            document.insertString(document.getLength(), "CPU: " + CPU + "\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
+            document.insertString(document.getLength(), "CPU: " + CPU + " (RR)\nexec: " + processID + "\ntime remaining: " + timeRemaining + " units", null);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -443,8 +1128,9 @@ public class GUI extends javax.swing.JFrame {
      * display the finished message.
      *
      * @param CPU The CPU that has finished
+     * @param algorithm The scheduling algorithm that was performed (HRRN or RR)
      */
-    public void displayCPUFinishMessage(int CPU)
+    public void displayCPUFinishMessage(int CPU, String algorithm)
     {
         StyledDocument document = null;
 
@@ -463,7 +1149,7 @@ public class GUI extends javax.swing.JFrame {
         // Print the finished message
         if (document != null) {
             try {
-                document.insertString(document.getLength(), "CPU: " + CPU + "\n\nNo more processes!", null);
+                document.insertString(document.getLength(), "CPU: " + CPU + " (" + algorithm + ")\n\nNo more processes!", null);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
@@ -471,23 +1157,31 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton PauseButton;
-    private javax.swing.JButton StartButton;
-    private javax.swing.JTextPane StatusPane1;
-    private javax.swing.JTextPane StatusPane2;
-    private javax.swing.JLabel SystemStatus;
-    private javax.swing.JTable Table1;
-    private javax.swing.JTable Table2;
-    private javax.swing.JTextField currentThroughputInput;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JTextField pollRateInput;
+    private JButton PauseButton;
+    private JButton StartButton;
+    private JTextPane StatusPane1;
+    private JTextPane StatusPane2;
+    private JTextField currentnTat1;
+    private JTextField currentnTat2;
+    private JTable fullTable1;
+    private JTable fullTable2;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JLabel jLabel6;
+    private JLabel jLabel7;
+    private JLabel jLabel8;
+    private JScrollPane jScrollPane1;
+    private JScrollPane jScrollPane2;
+    private JScrollPane jScrollPane3;
+    private JScrollPane jScrollPane4;
+    private JScrollPane jScrollPane5;
+    private JScrollPane jScrollPane6;
+    private JTextField pollRateInput;
+    private JTextField roundRobinTimeSlice;
+    private JLabel systemStatus;
+    private JTable waitingTable1;
+    private JTable waitingTable2;
     // End of variables declaration//GEN-END:variables
 }
